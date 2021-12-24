@@ -1,0 +1,152 @@
+body {
+	background-color: #eeeeee;
+	/* use absolute url with background-image */
+	background-image: url('http://localhost/cubing_sessions/application/stylesheets/pa_timer_gradient_bckrnd.jpg');
+	margin: 0;
+	font-family: 'Aller', sans-serif;
+	color: #efefef;
+}
+
+a {
+	text-decoration: none;
+}
+
+
+button {
+    display: inline-block;
+    border: none;
+    margin: 0;
+    cursor: pointer;
+    background: #6fd9ac;
+    font-family: 'Aller', sans-serif;
+	color: #ffffff;
+    /*
+    padding: 1rem 2rem;
+    color: #ffffff;
+    font-family: sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    */
+}
+/*
+button:hover,
+button:focus {
+    background: #0053ba;
+}
+
+button:focus {
+    outline: 1px solid #fff;
+    outline-offset: -4px;
+}
+
+button:active {
+    transform: scale(0.99);
+}
+*/
+
+/* divs */
+
+#header {
+	margin: 20px;
+	font-weight: 700px;
+}
+
+#timer {
+	margin: 50px;
+}
+
+/* Used for any overlays like the settings tab */
+
+.overlay_background {
+	display: none;
+	z-index: 20;
+	position: absolute;
+	/* Note to self - top and left only hold int val 0 */
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(100,100,100,0.6); /* dark teal */
+}
+
+/* settings screen */
+.overlay_screen {
+	display: none;
+	z-index: 21;
+	position: absolute;
+	top: 20%; 
+	left: 20%;
+	height: 60%;
+	width: 60%;
+	background-color: #0c5e55; /* dark teal */
+	text-align: center;
+}
+
+#solve_table {
+	display: inline;
+}
+
+#submit_times_container {
+	padding: 0px 50px 50px 200px;
+	display: inline;
+	font-size: 30px;
+	/* margin: auto; */
+}
+
+/* end of divs */
+
+.menu_actions {
+	font-size: 14px;
+	/* font-family: Futura, Arial; */
+	padding: 5px 20px;
+	color: #cccccc;
+}
+
+.menu_actions:hover {
+	color: #efefef;
+}
+
+#settings_menu_button {
+	background: none;
+}
+
+#display_settings_screen button {
+	margin: 5px;
+} 
+
+#site_title {
+	font-size: 20px;
+	color: #efefef;
+}
+
+#solve_submission_form {
+	display: inline;
+}
+
+#display_avgs {
+	margin: 10px 400px;
+}
+
+#display_solve_times {
+	display: block;
+	float: left;
+}
+
+#display_solve_times tbody {
+	display: block;
+	height: 400px;	
+	overflow-y: scroll;
+}
+
+
+#display_solve_times, #display_solve_times td {
+	background-color: #77dddd;
+	border: 1px solid green;
+	border-collapse: collapse; /* makes all borders overlap */
+	margin: 5px;
+	color: #555555;
+}
+
+#display_solve_times td {
+	padding: 5px 10px;
+}
