@@ -89,13 +89,17 @@ document.getElementById('toggle_ao5').addEventListener('click', function(event) 
 document.getElementById('toggle_ao12').addEventListener('click', function(event) {
 
 	console.log('toggle_ao12 button clicked');
-	var display_ao12 = document.getElementById('display_ao12');
+	var display_ao12_a = document.getElementsByClassName('display_ao12');
 
-	if (display_ao12.style.display == 'none') {
-		display_ao12.style.display = 'inline';
+	if (display_ao12_a[0].style.display == 'none') {
+		for (html_elem in display_ao12_a) {
+			html_elem.style.display = 'inline';			
+		}
 	} else {
 		console.log('toggle_ao12 currently shown');		
-		display_ao12.style.display = 'none';
+		for (html_elem in display_ao12_a) {
+			html_elem.style.display = 'none';			
+		}
 	}
 });
 
