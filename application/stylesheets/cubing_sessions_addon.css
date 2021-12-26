@@ -114,6 +114,10 @@ button:active {
 	margin: 5px;
 } 
 
+#display_settings_screen button:hover {
+	background-color: #0b8f80;
+} 
+
 #site_title {
 	font-size: 20px;
 	color: #efefef;
@@ -125,6 +129,18 @@ button:active {
 
 #display_avgs {
 	margin: 10px 400px;
+}
+
+/* see https://stackoverflow.com/questions/10933837/line-break-like-br-using-only-css */
+/* 
+Line break only using css, don't have to deal with <br> tag
+	\a = line break
+	'white-space: pre' = preformmated, treat char as line break in rendering
+*/
+
+#display_avgs span:after {
+    content:"\a";
+    white-space: pre;
 }
 
 #display_solve_times {

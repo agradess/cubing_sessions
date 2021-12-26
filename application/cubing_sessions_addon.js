@@ -87,9 +87,10 @@ document.getElementById('toggle_ao5').addEventListener('click', function(event) 
 });
 
 document.getElementById('toggle_ao12').addEventListener('click', function(event) {
-
+/*
 	console.log('toggle_ao12 button clicked');
 	var display_ao12_a = document.getElementsByClassName('display_ao12');
+// 	console.log(display_ao12_a);
 
 	if (display_ao12_a[0].style.display == 'none') {
 		for (html_elem in display_ao12_a) {
@@ -98,9 +99,21 @@ document.getElementById('toggle_ao12').addEventListener('click', function(event)
 	} else {
 		console.log('toggle_ao12 currently shown');		
 		for (html_elem in display_ao12_a) {
+// 			console.log('ao12 element:' + html_elem)
 			html_elem.style.display = 'none';			
 		}
 	}
+*/
+	console.log('toggle_ao12 button clicked');
+	var display_ao12 = document.getElementById('display_ao12');
+
+	if (display_ao12.style.display == 'none') {
+		display_ao12.style.display = 'inline';
+	} else {
+		console.log('toggle_ao12 currently shown');		
+		display_ao12.style.display = 'none';
+	}
+
 });
 
 document.getElementById('toggle_ao25').addEventListener('click', function(event) {

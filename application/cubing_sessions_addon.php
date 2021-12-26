@@ -314,26 +314,26 @@
 	
 	echo '<div id="display_avgs">';
 
-	echo '<span id="display_ao5" display="inline">ao5: ';
+	echo '<span id="display_ao5" style="display:inline">ao5: ';
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(2, 5, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><br class="display_ao12"><span class="display_ao12" display="inline">ao12: ';
+	echo '</span><span id="display_ao12" style="display:inline">ao12: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(2, 12, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><br class="display_ao25"><span class="display_ao25" style="display:none">ao25: ';
+	echo '</span><span id="display_ao25" style="display:none">ao25: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(4, 25, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><br class="display_ao50"><span class="display_ao50" style="display:none">ao50: ';
+	echo '</span><span id="display_ao50" style="display:none">ao50: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(6, 50, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><br class="display_ao100"><span class="display_ao100" style="display:none">ao100: ';
+	echo '</span><span id="display_ao100" style="display:none">ao100: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(10, 100, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
