@@ -22,8 +22,9 @@ throughout a single browser session.
 Notes:
 Averages in competitive Rubik's Cube solving with 5 or more times are calculated by trimming off some outliers.
 For example, an average of 5 is calcualte by removing the best and worst solves and averaging the three in the middle.
+The two files beginning with spacebar_timer_test were from several attempts to start and stop times with the spacebar.
 
 ### Current/Future Additions
 
 - Permanently storing times in a JSON file, as not working with "big" data.
-- Generating scrambles for each puzzle.
+- Generating scrambles for each puzzle using [TNoodle](https://github.com/thewca/tnoodle).
