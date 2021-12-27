@@ -21,6 +21,12 @@
 	 * TODO: Stop and start timer with spacebar, use jquery keyboard events
 	 * Created separate program to test out spacebar timing
 	 * 
+	 * TODO: Store times permanently (locally) in JSON file
+	 * TODO: Create json file in project manually
+	 * TODO: When new session started, load json file, stored as PHP multilevel array
+	 * TODO: When add a new time, add time to PHP array
+	 * TODO: Convert back to JSON and overwrite file contents
+	 * 
 	 */
 
     // manually remove warnings
