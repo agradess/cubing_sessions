@@ -22,9 +22,9 @@
 	 * Created separate program to test out spacebar timing
 	 * 
 	 * TODO: Store times permanently (locally) in JSON file
-	 * TODO: Create json file in project manually
-	 * TODO: When new session started, load json file, stored as PHP multilevel array
-	 * TODO: When add a new time, add time to PHP array
+	 * Create json file in project manually
+	 * When new session started, load json file, stored as PHP multilevel array
+	 * When add a new time, add time to PHP array
 	 * TODO: Convert back to JSON and overwrite file contents
 	 * 
 	 */
@@ -88,6 +88,10 @@
     
     session_start();
     
+    // Load times from local file
+    $local_times_json = file_get_contents("./db/cubing_times.json");
+    $local_times_a = json_decode($local_times_json, true);
+    
 	if (!isset($_SESSION['visits'])) {
 	    // Initialize variables for start of session
 	    
@@ -102,23 +106,19 @@
 	     * [(1) => [solve => 3.45, timestamp => 23 Jul ...], (2) => [...], ...]
 	     * 
 	     */
-	    $_SESSION['3x3_time_list'] = array();
-	    $_SESSION['2x2_time_list'] = array();
-	    $_SESSION['4x4_time_list'] = array();
-	    $_SESSION['5x5_time_list'] = array();
-	    $_SESSION['6x6_time_list'] = array();
-	    $_SESSION['7x7_time_list'] = array();
-	    $_SESSION['OH_time_list'] = array();
-	    $_SESSION['BLD_time_list'] = array();
-	    $_SESSION['FT_time_list'] = array();
-	    $_SESSION['Mega_time_list'] = array();
-	    $_SESSION['Pyra_time_list'] = array();
-	    $_SESSION['Skewb_time_list'] = array();
-	    $_SESSION['Sq-1_time_list'] = array();
-	    $_SESSION['4BLD_time_list'] = array();
-	    $_SESSION['5BLD_time_list'] = array();
-	    $_SESSION['MBLD_time_list'] = array();
-	    	    
+	    	    	    
+	    // For a new session, assign times db contents to session variables
+	    $event_list = array('3x3','2x2','4x4','5x5','6x6','7x7','OH','BLD','FT','Mega','Pyra','Skewb','Sq-1','4BLD','5BLD','MBLD');
+	    
+	    foreach ($event_list as $event) {
+	        $session_idx = $event . "_time_list";
+	        if (!isset($local_times_a[$event])) {
+	            $_SESSION[$session_idx] = array();
+	        } else {
+    	        $_SESSION[$session_idx] = $local_times_a[$event];
+    	    }
+	    }
+	    
 	    // reset form/POST data at beginning of each session
 	    unset($_POST);
 	    // Keeps track of when the user submitted a solve, for updating 3x3_time_list
@@ -143,7 +143,7 @@
 	   echo '<link rel="stylesheet" type="text/css" href="stylesheets/cubing_sessions_addon.css" />';
 	echo '</head>';
 	
-	echo '<body>';
+	echo '<body>';	
 	
 	// created overlay element for settings, see css overlay class
 	
@@ -235,6 +235,12 @@
 	       $_SESSION[$curr_time_list_name][] = array('solve' => $_POST['solve_time'],
 	           'timestamp' => $_POST['solve_time_timestamp']);
 	           // TODO: Fix for later: wrong time stamp, its for UTC
+	       
+	       // Update local storage file "cubing_times.json" 
+	       $local_times_a[$_SESSION['curr_puzzle']][] = array('solve' => $_POST['solve_time'],
+	           'timestamp' => $_POST['solve_time_timestamp']);
+	       $local_times_encoded = json_encode($local_times_a);
+	       file_put_contents("./db/cubing_times.json", $local_times_encoded);
 	    }
 	}
 
