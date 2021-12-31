@@ -71,8 +71,8 @@ document.getElementById('display_settings_screen').addEventListener('click', fun
 	settings_screen.style.display = 'block';
 });
 
-//							***** Settings Menu Functions *****
-
+//							***** Settings Menu Functions [UNUSED] *****
+/*
 document.getElementById('toggle_ao5').addEventListener('click', function(event) {
 
 	console.log('toggle_ao5 button clicked');
@@ -86,24 +86,9 @@ document.getElementById('toggle_ao5').addEventListener('click', function(event) 
 	}
 });
 
-document.getElementById('toggle_ao12').addEventListener('click', function(event) {
-/*
-	console.log('toggle_ao12 button clicked');
-	var display_ao12_a = document.getElementsByClassName('display_ao12');
-// 	console.log(display_ao12_a);
 
-	if (display_ao12_a[0].style.display == 'none') {
-		for (html_elem in display_ao12_a) {
-			html_elem.style.display = 'inline';			
-		}
-	} else {
-		console.log('toggle_ao12 currently shown');		
-		for (html_elem in display_ao12_a) {
-// 			console.log('ao12 element:' + html_elem)
-			html_elem.style.display = 'none';			
-		}
-	}
-*/
+document.getElementById('toggle_ao12').addEventListener('click', function(event) {
+
 	console.log('toggle_ao12 button clicked');
 	var display_ao12 = document.getElementById('display_ao12');
 
@@ -154,6 +139,7 @@ document.getElementById('toggle_ao100').addEventListener('click', function(event
 		display_ao100.style.display = 'none';
 	}
 });
+*/
 
 
 // 					***** Changing puzzle type (3x3, 2x2, ...) *****

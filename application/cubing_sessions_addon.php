@@ -92,6 +92,7 @@
     $local_times_json = file_get_contents("./db/cubing_times.json");
     $local_times_a = json_decode($local_times_json, true);
     
+    // If session hasn't started yet
 	if (!isset($_SESSION['visits'])) {
 	    // Initialize variables for start of session
 	    
@@ -99,6 +100,12 @@
 	    $_SESSION['visits'] = 1;
 	    // current puzzle times being displayed
 	    $_SESSION['curr_puzzle'] = '3x3';
+	    // current avgs beig displayed
+	    $_SESSION['curr_ao5_display'] = 'inline';
+	    $_SESSION['curr_ao12_display'] = 'inline';
+	    $_SESSION['curr_ao25_display'] = 'none';
+	    $_SESSION['curr_ao50_display'] = 'none';
+	    $_SESSION['curr_ao100_display'] = 'none';
 	    
 	    // stores the list of solve times displayed on screen
 	    // List structure:
@@ -152,14 +159,48 @@
 	
 	echo '<div id="display_settings_screen" class="overlay_screen" style="display:none">';
 	echo '<p>Settings</p>';
-	
 	echo '<p style="font-size:14px">Show/Hide Averages:</p>';
-	echo '<span><button id="toggle_ao5">ao5</button></span>';
-	echo '<br><span><button id="toggle_ao12">ao12</button></span>';
-	echo '<br><span><button id="toggle_ao25">ao25</button></span>';
-	echo '<br><span><button id="toggle_ao50">ao50</button></span>';
-	echo '<br><span><button id="toggle_ao100">ao100</button></span>';
 	
+	echo '<span><form method="post">';
+	echo '<select name="select_ao5_disp">';
+	echo '<option value="inline">Show</option>';
+	echo '<option value="none">Hide</option>';
+	echo '</select>';
+    echo '<button type="submit" id="toggle_ao5">ao5</button>';
+    echo '</form></span>';
+    
+    echo '<span><form method="post">';
+    echo '<select name="select_ao12_disp">';
+    echo '<option value="inline">Show</option>';
+    echo '<option value="none">Hide</option>';
+    echo '</select>';
+    echo '<button type="submit" id="toggle_ao12">ao12</button>';
+    echo '</form></span>';
+    
+    echo '<span><form method="post">';
+    echo '<select name="select_ao25_disp">';
+    echo '<option value="inline">Show</option>';
+    echo '<option value="none">Hide</option>';
+    echo '</select>';
+    echo '<button type="submit" id="toggle_ao25">ao25</button>';
+    echo '</form></span>';
+    
+    echo '<span><form method="post">';
+    echo '<select name="select_ao50_disp">';
+    echo '<option value="inline">Show</option>';
+    echo '<option value="none">Hide</option>';
+    echo '</select>';
+    echo '<button type="submit" id="toggle_ao50">ao50</button>';
+    echo '</form></span>';
+    
+    echo '<span><form method="post">';
+    echo '<select name="select_ao100_disp">';
+    echo '<option value="inline">Show</option>';
+    echo '<option value="none">Hide</option>';
+    echo '</select>';
+    echo '<button type="submit" id="toggle_ao100">ao100</button>';
+    echo '</form></span>';
+    
 	echo '</div>';
 	
 	echo '<div id="header">';
@@ -322,30 +363,40 @@
 	echo '</form>';
 	
 	
-	// count($_SESSION['3x3_time_list']) - 1 // last trim_and_avg param for current avg
-	
+	// Update averages display settings
+	if (isset($_POST['select_ao5_disp']) && $_SESSION['curr_ao5_display'] != $_POST['select_ao5_disp'])
+	    $_SESSION['curr_ao5_display'] = $_POST['select_ao5_disp'];
+    if (isset($_POST['select_ao12_disp']) && $_SESSION['curr_ao12_display'] != $_POST['select_ao12_disp'])
+        $_SESSION['curr_ao12_display'] = $_POST['select_ao12_disp'];
+    if (isset($_POST['select_ao25_disp']) && $_SESSION['curr_ao25_display'] != $_POST['select_ao25_disp'])
+        $_SESSION['curr_ao5_display'] = $_POST['select_ao5_disp'];
+    if (isset($_POST['select_ao50_disp']) && $_SESSION['curr_ao50_display'] != $_POST['select_ao50_disp'])
+        $_SESSION['curr_ao50_display'] = $_POST['select_ao50_disp'];
+    if (isset($_POST['select_ao100_disp']) && $_SESSION['curr_ao100_display'] != $_POST['select_ao100_disp'])
+        $_SESSION['curr_ao100_display'] = $_POST['select_ao100_disp'];
+
 	echo '<div id="display_avgs">';
 
-	echo '<span id="display_ao5" style="display:inline">ao5: ';
+	echo '<span id="display_ao5" style="display:'.$_SESSION['curr_ao5_display'].'">ao5: ';
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(2, 5, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><span id="display_ao12" style="display:inline">ao12: ';
+	echo '</span><span id="display_ao12" style="display:'.$_SESSION['curr_ao12_display'].'">ao12: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(2, 12, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><span id="display_ao25" style="display:none">ao25: ';
+	echo '</span><span id="display_ao25" style="display:'.$_SESSION['curr_ao25_display'].'">ao25: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(4, 25, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><span id="display_ao50" style="display:none">ao50: ';
+    echo '</span><span id="display_ao50" style="display:'.$_SESSION['curr_ao50_display'].'">ao50: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(6, 50, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
 	    // 	    echo trim_and_avg(4, 25, 100);
-	echo '</span><span id="display_ao100" style="display:none">ao100: ';
+    echo '</span><span id="display_ao100" style="display:'.$_SESSION['curr_ao100_display'].'">ao100: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(10, 100, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
