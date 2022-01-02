@@ -17,15 +17,27 @@
 	 * 
 	 * look into CSS grid layout
 	 * 
-	 * TODO: Research adding scramble with TNoodle
+	 * TODO: Install scrambo with npm
+	 * 
+	 * TODO: Generate scramble each time *a solve is submitted*
+	 * save current scramble in session var?
+	 * 
+	 * Option 1 - script in php file
+	 * script location inside of scramble div?
+	 * 
+	 * Option 2 - script in js file
+	 * every time new solve is submitted or puzzle type changed    
+	 * (event listener or call function)
+	 * send event name
+	 * have a mapping of events to scramble types
+	 * generate new scramble from scrambo
+	 * overwrite html content of scramble div
+	 * 
+	 * 
+	 * Giving up on for now
 	 * TODO: Stop and start timer with spacebar, use jquery keyboard events
 	 * Created separate program to test out spacebar timing
 	 * 
-	 * TODO: Store times permanently (locally) in JSON file
-	 * Create json file in project manually
-	 * When new session started, load json file, stored as PHP multilevel array
-	 * When add a new time, add time to PHP array
-	 * TODO: Convert back to JSON and overwrite file contents
 	 * 
 	 */
 
@@ -252,7 +264,7 @@
 // 	if ($_SESSION[$curr_time_list_name]) $solve_time_list_len = count($_SESSION[$curr_time_list_name]);
 	
 	if (isset($_POST['submit_solve']) && isset($_POST['solve_time']) && $_POST['solve_time'] != '') {
-// 	echo '<br>Valid time, can submit'; // debug
+// 	    echo '<br>Valid time, can submit'; // debug
 // 	       echo '<br>'; // debug
 // 	       print_r($_SESSION[$curr_time_list_name]); // debug
 	    if (isset($_SESSION[$curr_time_list_name])) {
@@ -286,7 +298,7 @@
 	}
 
 	
-    // Print out a table with the times, they should update as times are added
+    // Print out a table with the times, they update as times are added
 	// 2 rows, first row is solve #, second is the time list
 	echo '<table id="display_solve_times">';
 	
@@ -295,35 +307,33 @@
 	
 	echo '<td>';
 
-    // change puzzle selection
+    // change puzzle type
     echo '<form method="post" id="select_puzzle_form">';
     echo 'Event: '.$_SESSION['curr_puzzle'].'<br>';
     echo '<select id="puzzle_select" name="puzzle_select">';
 //     echo '<select id="puzzle_select" name="puzzle_select" value=\"'.$_SESSION['curr_puzzle'].'\">';
-    echo '<option value="3x3">3x3</option>'; // 3x3
-	echo '<option value="2x2">2x2</option>'; // 2x2
-	echo '<option value="4x4">4x4</option>'; // 4x4
-	echo '<option value="5x5">5x5</option>'; // 5x5
-	echo '<option value="6x6">6x6</option>'; // 6x6
-	echo '<option value="7x7">7x7</option>'; // 7x7
-	echo '<option value="OH">OH</option>'; // OH
-	echo '<option value="BLD">BLD</option>'; // BLD
-	echo '<option value="FT">FT</option>'; // FT
-	echo '<option value="Mega">Mega</option>'; // Mega
-	echo '<option value="Pyra">Pyra</option>'; // Pyra
-	echo '<option value="Skewb">Skewb</option>'; // Skewb
-	echo '<option value="Sq-1">Sq-1</option>'; // Sq-1
-	echo '<option value="4BLD">4BLD</option>'; // 4BLD
-	echo '<option value="5BLD">5BLD</option>'; // 5BLD
-	echo '<option value="MBLD">MBLD</option>'; // MBLD
+    echo '<option value="3x3">3x3</option>';
+	echo '<option value="2x2">2x2</option>';
+	echo '<option value="4x4">4x4</option>';
+	echo '<option value="5x5">5x5</option>';
+	echo '<option value="6x6">6x6</option>';
+	echo '<option value="7x7">7x7</option>';
+	echo '<option value="OH">OH</option>';
+	echo '<option value="BLD">BLD</option>';
+	echo '<option value="FT">FT</option>';
+	echo '<option value="Mega">Mega</option>';
+	echo '<option value="Pyra">Pyra</option>';
+	echo '<option value="Skewb">Skewb</option>';
+	echo '<option value="Sq-1">Sq-1</option>';
+	echo '<option value="4BLD">4BLD</option>';
+	echo '<option value="5BLD">5BLD</option>';
+	echo '<option value="MBLD">MBLD</option>';
 	
 	echo '</select>';                                        // date fmt: 24 Aug 2021 3:46 PM
 	echo '<input type="hidden" name="solve_time_timestamp" value="'.date('d M Y h:i:s a').'">'; // hidden timestamp
 	echo '<br><button type="submit" name="submit_puzzle">Change<br>Event</button>';
 	echo '<form>';
 	
-// 	echo '<hr>';
-//     echo '<b>#  |  Time</b>';
 	
 	echo '</td>';
 	echo '</tr>';
@@ -332,16 +342,16 @@
 	// Fill in the solve times table
 
 	// If time list is empty, table body will not print
-	if (isset($_SESSION[$curr_time_list_name])) { // changed
+	if (isset($_SESSION[$curr_time_list_name])) {
 	    
 	    echo '<tbody>';
 	    // Print table with latest times at top
-	    $solve_list_start_idx = count($_SESSION[$curr_time_list_name]) - 1; // changed
+	    $solve_list_start_idx = count($_SESSION[$curr_time_list_name]) - 1;
 	    for ($solve_num = $solve_list_start_idx; $solve_num >= 0 ; $solve_num--) {
 	        
 	        echo '<tr>';
 	        echo '<td>' . (int)$solve_num + 1 . '</td>';
-	        echo '<td>' . $_SESSION[$curr_time_list_name][$solve_num]['solve'] . '</td>'; // changed
+	        echo '<td>' . $_SESSION[$curr_time_list_name][$solve_num]['solve'] . '</td>';
 	        echo '</tr>';
 	    }
 	    echo '</tbody>';
@@ -369,7 +379,7 @@
     if (isset($_POST['select_ao12_disp']) && $_SESSION['curr_ao12_display'] != $_POST['select_ao12_disp'])
         $_SESSION['curr_ao12_display'] = $_POST['select_ao12_disp'];
     if (isset($_POST['select_ao25_disp']) && $_SESSION['curr_ao25_display'] != $_POST['select_ao25_disp'])
-        $_SESSION['curr_ao5_display'] = $_POST['select_ao5_disp'];
+        $_SESSION['curr_ao25_display'] = $_POST['select_ao25_disp'];
     if (isset($_POST['select_ao50_disp']) && $_SESSION['curr_ao50_display'] != $_POST['select_ao50_disp'])
         $_SESSION['curr_ao50_display'] = $_POST['select_ao50_disp'];
     if (isset($_POST['select_ao100_disp']) && $_SESSION['curr_ao100_display'] != $_POST['select_ao100_disp'])
