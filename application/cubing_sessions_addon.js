@@ -18,6 +18,10 @@
 		
  */
 
+const Scrambo = require('scrambo');
+
+
+
 // Pressing enter intentionally does not work to enter a solve time
 // **Only works if JQuery is included
 $(document).on('keypress',function(e) {
