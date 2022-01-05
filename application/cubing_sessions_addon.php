@@ -360,14 +360,15 @@
 	echo '</table>';
 	echo '</div>';
 	
+	echo '<div id="scramble_display"></div>';
+	
 	echo '<div id="submit_times_container">';
-	
-	
+		
 	// Update times input field with session vars
 	// NOT USED: take solve time w/ ajax method and post back to site
 	// Used Instead: Form data, when submitted, returns $_POST data
 	// however solve time comes back, update list
-	echo '<form id="solve_submission_form" method="post">';	
+	echo '<form id="solve_submission_form" method="post" action="submitted()">';	
 	echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
 	echo '<button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
 	echo '</form>';
@@ -419,13 +420,23 @@
 	// End of 'timer', content of the page
 	echo '</div>';
 	
-//                     -- Link Internal Scripts --
+//                          -- Internal Scripts --
 	
-	echo '<script src="cubing_sessions_addon.js"></script>';
+	echo '<script src="cubing_sessions_bundle.js"></script>';
+// 	echo '<script>';
+	
+// 	$gen_scramble_script = '
+//     const curr_scramble = new Scrambo("333");
+	    
+//     ';
+	
+// 	echo $gen_scramble_script;
+	
+// 	echo '</script>';
+	
 	echo '</body>';
 	echo '</html>';
 
 ?>
 <script>
-
 </script>

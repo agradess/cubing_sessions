@@ -3,7 +3,7 @@
 	 * Add-On for Cubing "Sessions Within Sessions"
 	 * 
 	 * Author: Adam Gradess
-	 * Last Updated: 12/24/2021
+	 * Last Updated: 1/5/2022
 	 * Description: Javascript to handle form input, sending data back
 	 * to page
 	 *
@@ -20,7 +20,11 @@
 
 const Scrambo = require('scrambo');
 
-
+//window.onload() = function() {
+	// var scramble_display = document.getElementById('scramble_display');
+	// scramble_display.innerHTML = curr_scramble;
+	
+//}
 
 // Pressing enter intentionally does not work to enter a solve time
 // **Only works if JQuery is included
@@ -35,6 +39,9 @@ $(document).on('keypress',function(e) {
 
 // Showing settings menu
 document.getElementById('settings_menu_button').addEventListener('click', function(event) {
+	
+	var curr_scramble = new Scrambo();
+	/console.log(curr_scramble == null);
 	
 	// alert('Settings menu clicked!'); // debug
 	var settings_screen_grayout = document.getElementById('display_settings');
