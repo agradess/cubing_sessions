@@ -86,11 +86,15 @@ button:active {
 	display: inline;
 }
 
-#submit_times_container {
+#scramble_display, #submit_times_container {
 	padding: 0px 50px 50px 200px;
 	display: inline;
 	font-size: 30px;
 	/* margin: auto; */
+}
+
+#scramble_display {
+	display: block;
 }
 
 /* end of divs */

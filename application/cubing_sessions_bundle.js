@@ -4,7 +4,7 @@
 	 * Add-On for Cubing "Sessions Within Sessions"
 	 * 
 	 * Author: Adam Gradess
-	 * Last Updated: 12/24/2021
+	 * Last Updated: 1/5/2022
 	 * Description: Javascript to handle form input, sending data back
 	 * to page
 	 *
@@ -20,8 +20,19 @@
  */
 
 const Scrambo = require('scrambo');
+var curr_scramble = new Scrambo();
+
+var scramble_display = document.getElementById('scramble_display');
+scramble_display.textContent = curr_scramble.get()[0];
 
 
+// console.log(curr_scramble.get()[0]);
+
+//window.onload() = function() {
+	// var scramble_display = document.getElementById('scramble_display');
+	// scramble_display.innerHTML = curr_scramble;
+	
+//}
 
 // Pressing enter intentionally does not work to enter a solve time
 // **Only works if JQuery is included
@@ -32,10 +43,14 @@ $(document).on('keypress',function(e) {
     }
 });
 
+function solve_subm(curr_puzzle) {
+	console.log(curr_puzzle);
+}
+
 // 					***** Showing/hiding menus *****
 
 // Showing settings menu
-document.getElementById('settings_menu_button').addEventListener('click', function(event) {
+document.getElementById('settings_menu_button').addEventListener('click', function(event) {	
 	
 	// alert('Settings menu clicked!'); // debug
 	var settings_screen_grayout = document.getElementById('display_settings');
@@ -51,8 +66,6 @@ document.getElementById('settings_menu_button').addEventListener('click', functi
 		settings_screen_grayout.style.display = 'block';
 		settings_screen.style.display = 'block';
 		}
-		// greys out page when settings are displayed
-		// settings_screen.style.boxShadow = '0 0 0 99999px rgba(0, 0, 0, .6)';
 	}
 	
 });

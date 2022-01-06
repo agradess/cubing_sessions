@@ -19,6 +19,13 @@
  */
 
 const Scrambo = require('scrambo');
+var curr_scramble = new Scrambo();
+
+var scramble_display = document.getElementById('scramble_display');
+scramble_display.textContent = curr_scramble.get()[0];
+
+
+// console.log(curr_scramble.get()[0]);
 
 //window.onload() = function() {
 	// var scramble_display = document.getElementById('scramble_display');
@@ -35,13 +42,14 @@ $(document).on('keypress',function(e) {
     }
 });
 
+function solve_subm(curr_puzzle) {
+	console.log(curr_puzzle);
+}
+
 // 					***** Showing/hiding menus *****
 
 // Showing settings menu
-document.getElementById('settings_menu_button').addEventListener('click', function(event) {
-	
-	var curr_scramble = new Scrambo();
-	/console.log(curr_scramble == null);
+document.getElementById('settings_menu_button').addEventListener('click', function(event) {	
 	
 	// alert('Settings menu clicked!'); // debug
 	var settings_screen_grayout = document.getElementById('display_settings');
@@ -57,8 +65,6 @@ document.getElementById('settings_menu_button').addEventListener('click', functi
 		settings_screen_grayout.style.display = 'block';
 		settings_screen.style.display = 'block';
 		}
-		// greys out page when settings are displayed
-		// settings_screen.style.boxShadow = '0 0 0 99999px rgba(0, 0, 0, .6)';
 	}
 	
 });
