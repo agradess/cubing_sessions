@@ -3,7 +3,7 @@
 	 * Add-On for Cubing "Sessions Within Sessions"
 	 * 
 	 * Author: Adam Gradess
-	 * Last Updated: 12/24/2021
+	 * Last Updated: 1/6/2021
 	 * 
 	 * Started: 6/29/2021
 	 * During the end of the first month of the Tayrex internship.
@@ -17,17 +17,14 @@
 	 * 
 	 * look into CSS grid layout
 	 * 
-	 * TODO: Install scrambo with npm
 	 * 
 	 * TODO: Generate scramble each time *a solve is submitted*
 	 * save current scramble in session var?
 	 * 
-	 * Option 1 - script in php file
-	 * script location inside of scramble div?
 	 * 
 	 * Option 2 - script in js file
 	 * every time new solve is submitted or puzzle type changed    
-	 * (event listener or call function)
+	 * (call function)
 	 * send event name
 	 * have a mapping of events to scramble types
 	 * generate new scramble from scrambo
@@ -360,14 +357,15 @@
 	echo '</table>';
 	echo '</div>';
 	
+	echo '<div id="scramble_display"></div>';
+	
 	echo '<div id="submit_times_container">';
-	
-	
+		
 	// Update times input field with session vars
 	// NOT USED: take solve time w/ ajax method and post back to site
 	// Used Instead: Form data, when submitted, returns $_POST data
 	// however solve time comes back, update list
-	echo '<form id="solve_submission_form" method="post">';	
+	echo '<form id="solve_submission_form" method="post" action="">';	
 	echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
 	echo '<button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
 	echo '</form>';
@@ -419,13 +417,20 @@
 	// End of 'timer', content of the page
 	echo '</div>';
 	
-//                     -- Link Internal Scripts --
+//                          -- Internal Scripts --
 	
-	echo '<script src="cubing_sessions_addon.js"></script>';
+	echo '<script src="cubing_sessions_bundle.js"></script>';
+// 	echo '<script>';
+	
+// 	$get_scramble_script = "\$.getScript(\'cubing_sessions_addon.js\', function() {solve_subm(";
+// 	$get_scramble_script .= $_SESSION['curr_puzzle'];
+// 	$get_scramble_script .= ");});";
+	
+// 	echo $get_scramble_script;
+	
+// 	echo '</script>';
+	
 	echo '</body>';
 	echo '</html>';
 
 ?>
-<script>
-
-</script>
