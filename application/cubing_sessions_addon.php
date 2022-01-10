@@ -95,6 +95,24 @@
     // Use trim_and_avg to do average of 5, 12, 25, etc.
 	
     
+    // TODO: Depends on the event?
+    // Determine the indexes at which sessions were ended
+    function find_session_idxs($solve_time_list, $max_time_diff = 1800000) {
+        $session_idxs = array();
+        
+        // Error handling
+        // check if array isset(), check length of array
+        
+        // Iterate through array to index len - 1
+        // at index i, if time difference between index i and i + 1
+        //      calculate time difference: convert timestamps to milliseconds since 1970
+        //      date_create($datetime_str) -> datetime obj; date_diff(obj1, obj2)
+        //      subtract i from i + 1
+        // is greater than $max_time_diff, add i to the list to be returned
+        
+        return $session_idxs;
+    }
+    
     session_start();
     
     // Load times from local file
@@ -124,7 +142,7 @@
 	     */
 	    	    	    
 	    // For a new session, assign times db contents to session variables
-	    $event_list = array('3x3','2x2','4x4','5x5','6x6','7x7','OH','BLD','FT','Mega','Pyra','Skewb','Sq-1','4BLD','5BLD','MBLD');
+	    $event_list = array('3x3','2x2','4x4','5x5','6x6','7x7','OH','BLD','FT','Mega','Pyra','Skewb','Sq-1','Clock','4BLD','5BLD','MBLD');
 	    
 	    foreach ($event_list as $event) {
 	        $session_idx = $event . "_time_list";
@@ -167,6 +185,7 @@
 	echo '</div>';
 	
 	echo '<div id="display_settings_screen" class="overlay_screen" style="display:none">';
+	// Content of settings tab
 	echo '<p>Settings</p>';
 	echo '<p style="font-size:14px">Show/Hide Averages:</p>';
 	
@@ -322,6 +341,7 @@
 	echo '<option value="Pyra">Pyra</option>';
 	echo '<option value="Skewb">Skewb</option>';
 	echo '<option value="Sq-1">Sq-1</option>';
+	echo '<option value="Clock">Clock</option>';
 	echo '<option value="4BLD">4BLD</option>';
 	echo '<option value="5BLD">5BLD</option>';
 	echo '<option value="MBLD">MBLD</option>';
@@ -365,7 +385,7 @@
 	// NOT USED: take solve time w/ ajax method and post back to site
 	// Used Instead: Form data, when submitted, returns $_POST data
 	// however solve time comes back, update list
-	echo '<form id="solve_submission_form" method="post" action="">';	
+	echo '<form id="solve_submission_form" method="post">';	
 	echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
 	echo '<button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
 	echo '</form>';
@@ -419,16 +439,17 @@
 	
 //                          -- Internal Scripts --
 	
-	echo '<script src="cubing_sessions_bundle.js"></script>';
-// 	echo '<script>';
+	echo '<script src="cubing_sessions_addon.js"></script>';
+	echo '<script src="../node_modules/scrambo/scrambo.js"></script>';
+	echo '<script>';
 	
-// 	$get_scramble_script = "\$.getScript(\'cubing_sessions_addon.js\', function() {solve_subm(";
-// 	$get_scramble_script .= $_SESSION['curr_puzzle'];
-// 	$get_scramble_script .= ");});";
+	$get_scramble_script = "\$.getScript('cubing_sessions_addon.js', function() {
+	   gen_scramble('".$_SESSION['curr_puzzle']."');
+        });";
 	
-// 	echo $get_scramble_script;
+	echo $get_scramble_script;
 	
-// 	echo '</script>';
+	echo '</script>';
 	
 	echo '</body>';
 	echo '</html>';

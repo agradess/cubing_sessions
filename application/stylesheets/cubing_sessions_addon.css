@@ -90,6 +90,7 @@ button:active {
 	padding: 0px 50px 50px 200px;
 	display: inline;
 	font-size: 30px;
+	text-align: center;
 	/* margin: auto; */
 }
 

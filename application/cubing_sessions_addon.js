@@ -3,7 +3,7 @@
 	 * Add-On for Cubing "Sessions Within Sessions"
 	 * 
 	 * Author: Adam Gradess
-	 * Last Updated: 1/5/2022
+	 * Last Updated: 1/9/2022
 	 * Description: Javascript to handle form input, sending data back
 	 * to page
 	 *
@@ -18,12 +18,28 @@
 		
  */
 
-const Scrambo = require('scrambo');
-var curr_scramble = new Scrambo();
+// const Scrambo = require('scrambo');
 
-var scramble_display = document.getElementById('scramble_display');
-scramble_display.textContent = curr_scramble.get()[0];
 
+
+function gen_scramble(curr_puzzle) {
+	
+	const puzz_to_scram = {'3x3':'333','2x2':'222','4x4':'444','5x5':'555',
+		'6x6':'666','7x7':'777','OH':'333','BLD':'333','FT':'333','Mega':'minx',
+		'Pyra':'pyram','Skewb':'skewb','Sq-1':'sq1','Clock':'clock','4BLD':'444',
+		'5BLD':'555','MBLD':'333'};
+	// Specifying scramble lengths that would otherwise be too short or too long
+	// according to scrambo.
+	const scram_lens = {'222': 11,'444': 40,'555': 60,'666': 80,'777': 100};
+	var curr_scram = puzz_to_scram[curr_puzzle];
+	
+	var scramble_display = document.getElementById('scramble_display');
+	if (scram_lens[curr_scram] != null) {
+		scramble_display.textContent = new Scrambo().type(curr_scram).length(scram_lens[curr_scram]).get()[0];
+	} else {
+		scramble_display.textContent = new Scrambo().type(curr_scram).get()[0];
+	}
+}
 
 // console.log(curr_scramble.get()[0]);
 
@@ -41,10 +57,6 @@ $(document).on('keypress',function(e) {
 		return false;
     }
 });
-
-function solve_subm(curr_puzzle) {
-	console.log(curr_puzzle);
-}
 
 // 					***** Showing/hiding menus *****
 
@@ -160,23 +172,23 @@ document.getElementById('toggle_ao100').addEventListener('click', function(event
 
 
 // 					***** Changing puzzle type (3x3, 2x2, ...) *****
-
+/*
 document.getElementById('puzzle_select').addEventListener('change', function(event) {
 	
 	console.log('Puzzle changed.');
 	var puzzle_select = document.getElementById('select_puzzle');
 	var i_puzzle_type = puzzle_select.value;
 	
-/*	
+	
 	$.ajax({
   		method: "POST",
   		url: "cubing_sessions_addon.php?puzzle_type="+i_puzzle_type,
   		success: function(response_to_puzzle_change) {
   			console.log('Changed puzzle to '+i_puzzle_type);
   		},
-	}); */
+	});
 });
-
+*/
 // AJAX BELOW DOES NOT WORK, USING A FORM OR SOME OTHER METHOD TO SEND SOLVE TIMES
 
 // gets up to point where data is grabbed and logged to console, but
