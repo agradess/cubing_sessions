@@ -51,7 +51,7 @@ button:active {
 	font-weight: 700px;
 }
 
-#timer {
+#timer, #stats_menu {
 	margin: 50px;
 }
 
@@ -111,7 +111,7 @@ button:active {
 	color: #efefef;
 }
 
-#settings_menu_button {
+#header button {
 	background: none;
 }
 
@@ -155,7 +155,8 @@ Line break only using css, don't have to deal with <br> tag
 
 #display_solve_times tbody {
 	display: block;
-	height: 400px;	
+	height: 400px;
+	font-size: 14px;
 	overflow-y: scroll;
 }
 

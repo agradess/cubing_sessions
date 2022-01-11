@@ -41,13 +41,6 @@ function gen_scramble(curr_puzzle) {
 	}
 }
 
-// console.log(curr_scramble.get()[0]);
-
-//window.onload() = function() {
-	// var scramble_display = document.getElementById('scramble_display');
-	// scramble_display.innerHTML = curr_scramble;
-	
-//}
 
 // Pressing enter intentionally does not work to enter a solve time
 // **Only works if JQuery is included
@@ -60,15 +53,38 @@ $(document).on('keypress',function(e) {
 
 // 					***** Showing/hiding menus *****
 
+// Toggling statistics and timer menus
+
+var stats_menu = document.getElementById('stats_menu');
+var timer_page = document.getElementById('timer');	
+
+// Show stats menu
+document.getElementById('stats_menu_button').addEventListener('click', function(event) {	
+		
+	if (stats_menu.style.display == 'none') {
+		stats_menu.style.display = 'block';
+		timer_page.style.display = 'none';
+	}
+	
+});
+
+// Show timer menu
+document.getElementById('timer_page_button').addEventListener('click', function(event) {	
+			
+	if (timer_page.style.display == 'none') {
+		timer_page.style.display = 'block';
+		stats_menu.style.display = 'none';
+	}
+	
+});
+
 // Showing settings menu
 document.getElementById('settings_menu_button').addEventListener('click', function(event) {	
 	
-	// alert('Settings menu clicked!'); // debug
+	console.log('Settings menu clicked');
 	var settings_screen_grayout = document.getElementById('display_settings');
 	var settings_screen = document.getElementById('display_settings_screen');	
-	
-	console.log(settings_screen_grayout.style.display);
-	
+		
 	if (settings_screen_grayout.style.display != 'none') {
 		settings_screen_grayout.style.display = 'none';
 		settings_screen.style.display = 'none';

@@ -94,26 +94,49 @@
     
     // Use trim_and_avg to do average of 5, 12, 25, etc.
 	
+    function ao5($end_index, $curr_time_list) {
+        return trim_and_avg(2, 5, $end_index, $curr_time_list);
+    }
     
     // TODO: Depends on the event?
     // Determine the indexes at which sessions were ended
-    function find_session_idxs($solve_time_list, $max_time_diff = 1800000) {
+    // $solve_time_list: type array
+    // $max_time_diff: default - 30 min in milliseconds
+    function find_session_idxs($solve_time_list, $max_time_diff = 30) {
+        
         $session_idxs = array();
         
         // Error handling
         // check if array isset(), check length of array
         
-        // Iterate through array to index len - 1
-        // at index i, if time difference between index i and i + 1
-        //      calculate time difference: convert timestamps to milliseconds since 1970
-        //      date_create($datetime_str) -> datetime obj; date_diff(obj1, obj2)
-        //      subtract i from i + 1
-        // is greater than $max_time_diff, add i to the list to be returned
-        
+        // Iterate through array to second to last solve
+        for ($solve_num = 0; $solve_num < count($solve_time_list) - 1; $solve_num++) {
+            
+            $timestamp_2nd = $solve_time_list[$solve_num + 1]['timestamp'];
+            $timestamp_1st = $solve_time_list[$solve_num]['timestamp'];
+            $datetime_obj_2nd = date_create($timestamp_2nd);
+            $datetime_obj_1st = date_create($timestamp_1st);
+            // difference between timestamps
+            $solve_time_diff = date_diff($datetime_obj_1st, $datetime_obj_2nd);
+            // print_r($solve_time_diff) . '<br><br>';
+            
+            // If two solves are greater than $max_time_diff apart,
+            // denote this index i as the end of a session by
+            // adding i to the return list
+            if ($solve_time_diff['i'] > $max_time_diff) { // ERROR: cannot use obj as array
+                $session_idxs[] = $solve_num;
+                echo $solve_num . '<br>';
+            }
+        }
+            
         return $session_idxs;
     }
     
     session_start();
+    
+    
+    //              ***** Initialize variables for start of session *****
+    
     
     // Load times from local file
     $local_times_json = file_get_contents("./db/cubing_times.json");
@@ -121,7 +144,6 @@
     
     // If session hasn't started yet
 	if (!isset($_SESSION['visits'])) {
-	    // Initialize variables for start of session
 	    
 	    // keeps track of page visits during session
 	    $_SESSION['visits'] = 1;
@@ -178,6 +200,8 @@
 	echo '</head>';
 	
 	echo '<body>';	
+	
+	// find_session_idxs($_SESSION['3x3_time_list']); // debug
 	
 	// created overlay element for settings, see css overlay class
 	
@@ -237,15 +261,22 @@
 	
 	echo '<span id="site_title">PA Cubing</span>';
     echo '<span class="menu_actions">Home</span>';
-    echo '<span class="menu_actions">Timer</span>';
-    echo '<span class="menu_actions">Statistics</span>';
+    echo '<span><button class="menu_actions" id="timer_page_button">Timer</button></span>';
+    echo '<span><button class="menu_actions" id="stats_menu_button">Statistics</button></span>';
 //     echo '<span class="menu_actions"><button id="settings_menu_button">Settings</button></span>';
     echo '<span><button class="menu_actions" id="settings_menu_button">Settings</button></span>';
-    echo '<span class="menu_actions"><a';
-    echo '    href="https://www.webfx.com/blog/web-design/modern-web-design/">Web Design</a>';
-    echo '</span>';
+	// Web Design Link: (keeping for reference)
+	// echo '<span class="menu_actions"><a';
+    // echo '    href="https://www.webfx.com/blog/web-design/modern-web-design/">Web Design</a>';
+    // echo '</span>';
     
 	echo '</div>';
+	
+	echo '<div id="stats_menu" style="display:none"></div>';
+	// Stats ideas
+	// average session length
+	// session length graph over time
+	// average last 5 sessions
 	
 	echo '<div id="timer">';
 	
@@ -364,11 +395,12 @@
 	    echo '<tbody>';
 	    // Print table with latest times at top
 	    $solve_list_start_idx = count($_SESSION[$curr_time_list_name]) - 1;
-	    for ($solve_num = $solve_list_start_idx; $solve_num >= 0 ; $solve_num--) {
+	    for ($solve_num = $solve_list_start_idx; $solve_num >= 0; $solve_num--) {
 	        
 	        echo '<tr>';
 	        echo '<td>' . (int)$solve_num + 1 . '</td>';
 	        echo '<td>' . $_SESSION[$curr_time_list_name][$solve_num]['solve'] . '</td>';
+	        echo '<td>' . ao5($solve_num, $curr_time_list_name) . '</td>';
 	        echo '</tr>';
 	    }
 	    echo '</tbody>';
@@ -439,7 +471,7 @@
 	
 //                          -- Internal Scripts --
 	
-	echo '<script src="cubing_sessions_addon.js"></script>';
+	// echo '<script src="cubing_sessions_addon.js"></script>';
 	echo '<script src="../node_modules/scrambo/scrambo.js"></script>';
 	echo '<script>';
 	
