@@ -3,7 +3,7 @@
 	 * Add-On for Cubing "Sessions Within Sessions"
 	 * 
 	 * Author: Adam Gradess
-	 * Last Updated: 1/6/2021
+	 * Last Updated: 1/12/2021
 	 * 
 	 * Started: 6/29/2021
 	 * During the end of the first month of the Tayrex internship.
@@ -18,23 +18,9 @@
 	 * look into CSS grid layout
 	 * 
 	 * 
-	 * TODO: Generate scramble each time *a solve is submitted*
-	 * save current scramble in session var?
-	 * 
-	 * 
-	 * Option 2 - script in js file
-	 * every time new solve is submitted or puzzle type changed    
-	 * (call function)
-	 * send event name
-	 * have a mapping of events to scramble types
-	 * generate new scramble from scrambo
-	 * overwrite html content of scramble div
-	 * 
-	 * 
 	 * Giving up on for now
 	 * TODO: Stop and start timer with spacebar, use jquery keyboard events
 	 * Created separate program to test out spacebar timing
-	 * 
 	 * 
 	 */
 
@@ -92,7 +78,7 @@
         }
     }
     
-    // Use trim_and_avg to do average of 5, 12, 25, etc.
+    // Use trim_and_avg to compute average of 5, 12, 25, etc.
 	
     function ao5($end_index, $curr_time_list) {
         return trim_and_avg(2, 5, $end_index, $curr_time_list);
@@ -100,43 +86,38 @@
     
     // TODO: Depends on the event?
     // Determine the indexes at which sessions were ended
-    // $solve_time_list: type array
-    // $max_time_diff: default - 30 min in milliseconds
+    // $solve_time_list: array
+    // $max_time_diff: int, default - 30 min
     function find_session_idxs($solve_time_list, $max_time_diff = 30) {
         
         $session_idxs = array();
         
-        // Error handling
-        // check if array isset(), check length of array
+        // Error handling, don't compute if less than 3 solves
+		if (!isset($solve_time_list) || count($solve_time_list) <= 3) return false;
         
-        // Iterate through array to second to last solve
+        // Iterate through array until 2nd to last solve
         for ($solve_num = 0; $solve_num < count($solve_time_list) - 1; $solve_num++) {
             
-            $timestamp_2nd = $solve_time_list[$solve_num + 1]['timestamp'];
-            $timestamp_1st = $solve_time_list[$solve_num]['timestamp'];
-            $datetime_obj_2nd = date_create($timestamp_2nd);
-            $datetime_obj_1st = date_create($timestamp_1st);
-            // difference between timestamps
-            $solve_time_diff = date_diff($datetime_obj_1st, $datetime_obj_2nd);
-            // print_r($solve_time_diff) . '<br><br>';
-            
+            $datetime_obj_2nd = date_create($solve_time_list[$solve_num + 1]['timestamp']);
+            $datetime_obj_1st = date_create($solve_time_list[$solve_num]['timestamp']);
+			// array containing time difference, lists day, month, yr, etc.
+			$solve_time_diff_a = (array)date_diff($datetime_obj_1st, $datetime_obj_2nd); // cast obj as array
             // If two solves are greater than $max_time_diff apart,
             // denote this index i as the end of a session by
-            // adding i to the return list
-            if ($solve_time_diff['i'] > $max_time_diff) { // ERROR: cannot use obj as array
+			// adding i to the return list
+            if ($solve_time_diff_a['i'] > $max_time_diff) {
                 $session_idxs[] = $solve_num;
-                echo $solve_num . '<br>';
             }
         }
-            
-        return $session_idxs;
+		
+		return $session_idxs;
     }
-    
-    session_start();
     
     
     //              ***** Initialize variables for start of session *****
-    
+	
+	
+	session_start();
     
     // Load times from local file
     $local_times_json = file_get_contents("./db/cubing_times.json");
@@ -201,7 +182,7 @@
 	
 	echo '<body>';	
 	
-	// find_session_idxs($_SESSION['3x3_time_list']); // debug
+	// print_r(find_session_idxs($_SESSION['3x3_time_list'])); // debug
 	
 	// created overlay element for settings, see css overlay class
 	
@@ -471,7 +452,6 @@
 	
 //                          -- Internal Scripts --
 	
-	// echo '<script src="cubing_sessions_addon.js"></script>';
 	echo '<script src="../node_modules/scrambo/scrambo.js"></script>';
 	echo '<script>';
 	
