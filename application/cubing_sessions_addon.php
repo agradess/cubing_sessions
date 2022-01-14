@@ -92,26 +92,65 @@
         
         $session_idxs = array();
         
-        // Error handling, don't compute if less than 3 solves
-		if (!isset($solve_time_list) || count($solve_time_list) <= 3) return false;
+        // Error handling, if less than 3 solves return empty arr
+		if (!isset($solve_time_list) || count($solve_time_list) <= 3) return array();
         
         // Iterate through array until 2nd to last solve
         for ($solve_num = 0; $solve_num < count($solve_time_list) - 1; $solve_num++) {
-            
+			
             $datetime_obj_2nd = date_create($solve_time_list[$solve_num + 1]['timestamp']);
             $datetime_obj_1st = date_create($solve_time_list[$solve_num]['timestamp']);
 			// array containing time difference, lists day, month, yr, etc.
-			$solve_time_diff_a = (array)date_diff($datetime_obj_1st, $datetime_obj_2nd); // cast obj as array
+			$solve_time_diff_a = date_diff($datetime_obj_1st, $datetime_obj_2nd);
             // If two solves are greater than $max_time_diff apart,
             // denote this index i as the end of a session by
 			// adding i to the return list
-            if ($solve_time_diff_a['i'] > $max_time_diff) {
-                $session_idxs[] = $solve_num;
+            if ($solve_time_diff_a->format('%i') > $max_time_diff) {
+				$session_idxs[] = $solve_num;
             }
-        }
+		}
 		
+		$session_idxs[] = count($solve_time_list) - 1;
 		return $session_idxs;
-    }
+	}
+	
+	// For the current puzzle:
+	// For each session, list number of solves, date started 
+	function show_sessions() {
+		$curr_time_list = $_SESSION['curr_puzzle'] . '_time_list';
+		$session_end_idx = find_session_idxs($_SESSION[$curr_time_list]);
+		
+		echo '<p style="font-size:40px">Statistics</p><hr>';
+		echo '<p style="text-align:center">Sessions for '.$_SESSION['curr_puzzle'].'</p>';
+		echo '<table id="show_sessions_table"><tbody><tr>';
+
+		$solve_idx = 0;
+		$session_num = 1;
+		$session_start_date = date_create($_SESSION[$curr_time_list][0]['timestamp']);
+		$session_start_date = $session_start_date->format('M j'); // Prints: Dec 7
+		$curr_session_len = 0;
+
+		while ($solve_idx < count($_SESSION[$curr_time_list])) {
+			if (in_array($solve_idx, $session_end_idx)) {
+				
+				$curr_session_len += 1;
+				echo '<td>Session '.$session_num.'<br>' . $session_start_date.'<br>';
+				echo $curr_session_len.($curr_session_len == 1 ? ' solve' : ' solves').'</td>';
+
+				// reset/update counters
+				$session_num += 1;
+				$curr_session_len = 0;
+				$session_start_date = date_create($_SESSION[$curr_time_list][$solve_idx + 1]['timestamp']);
+				$session_start_date = $session_start_date->format('M j');
+			} else {
+				$curr_session_len += 1;
+			}
+			
+			$solve_idx += 1;
+		}
+
+		echo '</tr></tbody></table>';
+	}
     
     
     //              ***** Initialize variables for start of session *****
@@ -181,9 +220,7 @@
 	echo '</head>';
 	
 	echo '<body>';	
-	
-	// print_r(find_session_idxs($_SESSION['3x3_time_list'])); // debug
-	
+		
 	// created overlay element for settings, see css overlay class
 	
 	echo '<div id="display_settings" class="overlay_background" style="display:none">';
@@ -252,20 +289,11 @@
     // echo '</span>';
     
 	echo '</div>';
+
 	
-	echo '<div id="stats_menu" style="display:none"></div>';
-	// Stats ideas
-	// average session length
-	// session length graph over time
-	// average last 5 sessions
-	
-	echo '<div id="timer">';
-	
-	echo '<div id="solve_table">';
-	
+	//					***** Updating Puzzle Type and Entering New Solves *****
 	
 	// Debugging with $_POST data
-	
 //     echo '<br>$_POST data: ';
 // 	if (isset($_POST)) print_r($_POST); // debug print $_POST
 //     echo '<br>';
@@ -325,6 +353,15 @@
 	    }
 	}
 
+	// 						***** Menus/End of Header *****
+
+	echo '<div id="stats_menu" style="display:none">';
+	show_sessions();
+	echo '</div>';
+	
+	echo '<div id="timer">';
+	
+	echo '<div id="solve_table">';
 	
     // Print out a table with the times, they update as times are added
 	// 2 rows, first row is solve #, second is the time list

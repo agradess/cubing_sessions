@@ -153,13 +153,22 @@ Line break only using css, don't have to deal with <br> tag
 	float: left;
 }
 
+#show_sessions_table {
+	margin: 20px auto;
+	background-color: #0c5e55; /* same color as settings screen */
+	width: 800px;
+	overflow-x: scroll;
+	scrollbar-width: none;
+	text-align: center;
+
+}
+
 #display_solve_times tbody {
 	display: block;
 	height: 400px;
 	font-size: 14px;
 	overflow-y: scroll;
 }
-
 
 #display_solve_times, #display_solve_times td {
 	background-color: #77dddd;
@@ -169,6 +178,6 @@ Line break only using css, don't have to deal with <br> tag
 	color: #555555;
 }
 
-#display_solve_times td {
+#display_solve_times td, #show_sessions_table td {
 	padding: 5px 10px;
 }
