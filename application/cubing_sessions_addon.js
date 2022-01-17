@@ -18,9 +18,6 @@
 		
  */
 
-// const Scrambo = require('scrambo');
-
-
 
 function gen_scramble(curr_puzzle) {
 	
@@ -41,6 +38,19 @@ function gen_scramble(curr_puzzle) {
 	}
 }
 
+function js_display_1_session(session_num, curr_time_lst, session_end_idxs) {
+	console.log(session_num);
+	console.log(curr_time_lst);
+	console.log(session_end_idxs);
+
+	// hide everything and show p tag with id: session_#_stats
+	session_stats_tags = document.getElementsByClassName('session_stats');
+	console.log(session_stats_tags);
+	for (var i = 0; i < session_stats_tags.length; i++) session_stats_tags[i].style.display = 'none';
+	// for (session_stats in session_stats_tags) session_stats.style.display = 'none';
+	session_stats_to_show = document.getElementById('session_' + session_num + '_stats');
+	session_stats_to_show.style.display = 'block';
+}
 
 // Pressing enter intentionally does not work to enter a solve time
 // **Only works if JQuery is included

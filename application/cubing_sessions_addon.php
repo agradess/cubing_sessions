@@ -78,10 +78,15 @@
         }
     }
     
-    // Use trim_and_avg to compute average of 5, 12, 25, etc.
+	// Helper fxns: Use trim_and_avg to compute average of 5, 12, 25, etc.
+	// $curr_time_list: NAME of the list, not the list itself
 	
     function ao5($end_index, $curr_time_list) {
         return trim_and_avg(2, 5, $end_index, $curr_time_list);
+	}
+	
+	function ao12($end_index, $curr_time_list) {
+        return trim_and_avg(2, 12, $end_index, $curr_time_list);
     }
     
     // TODO: Depends on the event?
@@ -113,7 +118,45 @@
 		$session_idxs[] = count($solve_time_list) - 1;
 		return $session_idxs;
 	}
+
+	// Calculates median, best single, best mo3, best ao5, best ao12
+	// $curr_time_list: Name of the list, indexed into $_SESSION ('3x3_time_list')
+	function session_stats($session_num, $solve_time_list, $session_end_idx_a) {
+		
+		$stats_a = array('b_mo3' => max($_SESSION[$solve_time_list])['solve'],
+			'b_ao5' => max($_SESSION[$solve_time_list])['solve'], 'b_ao12' => max($_SESSION[$solve_time_list])['solve']);
+		$session_start_idx = $session_num == 1 ? 0 : $session_end_idx_a[$session_num - 2];
+		$session_end_idx = $session_end_idx_a[$session_num - 1];
+		
+		// $times_len = count($_SESSION[$solve_time_list]);
+		$times_len = $session_end_idx - $session_start_idx;
+		// single and median
+		$stats_a['b_single'] = min(array_slice($_SESSION[$solve_time_list],$session_start_idx,$times_len))['solve'];
+		$time_list_sorted = array_slice($_SESSION[$solve_time_list],$session_start_idx,$times_len);
+		sort($time_list_sorted);
+		$stats_a['median'] = $time_list_sorted[floor($times_len / 2) + 1]['solve'];
+
+		// mo3, ao5, ao12
+		for ($solve_idx = $session_start_idx; $solve_idx <= $session_end_idx; $solve_idx += 1) {
+			if ($solve_idx > 2 + $session_start_idx) {
+				$prev_3_solves = ($_SESSION[$solve_time_list][$solve_idx]['solve'] + $_SESSION[$solve_time_list][$solve_idx - 1]['solve'] + $_SESSION[$solve_time_list][$solve_idx - 2]['solve'])/3;
+				$mo3 = number_format((float)$prev_3_solves, 2, '.', '');
+				$stats_a['b_mo3'] = $mo3 < $stats_a['b_mo3'] ? $mo3 : $stats_a['b_mo3']; // mo3
+			}
+			if ($solve_idx > 4 + $session_start_idx) {
+				$ao5 = ao5($solve_idx, $solve_time_list);
+				$stats_a['b_ao5'] = $ao5 < $stats_a['b_ao5'] ? $ao5 : $stats_a['b_ao5']; // ao5
+			}
+			if ($solve_idx > 11 + $session_start_idx) {
+				$ao12 = ao12($solve_idx, $solve_time_list);
+				$stats_a['b_ao12'] = $ao12 < $stats_a['b_ao12'] ? $ao12 : $stats_a['b_ao12']; // ao12
+			}
+		}
+
+		return $stats_a;
+	}
 	
+	// Creates the statistics page
 	// For the current puzzle:
 	// For each session, list number of solves, date started 
 	function show_sessions() {
@@ -122,20 +165,35 @@
 		
 		echo '<p style="font-size:40px">Statistics</p><hr>';
 		echo '<p style="text-align:center">Sessions for '.$_SESSION['curr_puzzle'].'</p>';
-		echo '<table id="show_sessions_table"><tbody><tr>';
+		echo '<p style="text-align:center">Click on a session to view its stats.</p>';
+		echo '<div id="show_sessions_cont"><table id="show_sessions_table"><tbody><tr>';
 
 		$solve_idx = 0;
 		$session_num = 1;
 		$session_start_date = date_create($_SESSION[$curr_time_list][0]['timestamp']);
 		$session_start_date = $session_start_date->format('M j'); // Prints: Dec 7
 		$curr_session_len = 0;
+		$session_stats_a = array();
 
 		while ($solve_idx < count($_SESSION[$curr_time_list])) {
 			if (in_array($solve_idx, $session_end_idx)) {
-				
+				// Build table column and send individual session data once clicked
 				$curr_session_len += 1;
-				echo '<td>Session '.$session_num.'<br>' . $session_start_date.'<br>';
+				echo "<td onclick='session_stats(".$session_num.",".json_encode($_SESSION[$curr_time_list]).",".json_encode($session_end_idx).")'>";
+				echo 'Session '.$session_num.'<br>' . $session_start_date.'<br>';
 				echo $curr_session_len.($curr_session_len == 1 ? ' solve' : ' solves').'</td>';
+				// Median, best single, best mo3, best ao5, best ao12
+				$session_stats_a[] = session_stats($session_num, $curr_time_list, $session_end_idx);				
+
+				echo '<script>
+				function session_stats(session_num, curr_time_lst, session_end_idxs) {
+				
+					$.getScript("cubing_sessions_addon.js", function() {
+						js_display_1_session(session_num - 1, curr_time_lst, session_end_idxs);
+        			});
+
+				}
+				</script>';
 
 				// reset/update counters
 				$session_num += 1;
@@ -150,6 +208,20 @@
 		}
 
 		echo '</tr></tbody></table>';
+		echo '<div id="session_graph"></div>';
+		$session_idx = 0;
+		$worst_solve = max($_SESSION[$curr_time_list])['solve'];
+		foreach ($session_stats_a as $session_stats) {
+			echo '<p class="session_stats" id="session_'.$session_idx.'_stats" style="display:none">';
+			echo 'Median: '.$session_stats['median'].'<br>';
+			echo 'Best single: '.$session_stats['b_single'];
+			if ($session_stats['b_mo3'] != $worst_solve) echo '<br>'.'Best mo3: '.$session_stats['b_mo3'];
+			if ($session_stats['b_ao5'] != $worst_solve) echo '<br>'.'Best ao5: '.$session_stats['b_ao5'];
+			if ($session_stats['b_ao12'] != $worst_solve) echo '<br>'.'Best ao12: '.$session_stats['b_ao12'];
+			echo '</p>';
+			$session_idx += 1;
+		}
+		echo '</div>'; // closing tag for 'show_sessions_cont'
 	}
     
     

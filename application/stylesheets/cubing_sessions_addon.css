@@ -153,14 +153,21 @@ Line break only using css, don't have to deal with <br> tag
 	float: left;
 }
 
-#show_sessions_table {
+#show_sessions_cont {
 	margin: 20px auto;
+	width: 800px;
+}
+
+#show_sessions_table {
 	background-color: #0c5e55; /* same color as settings screen */
+	text-align: center;
+}
+
+#show_sessions_table tbody {
+	/* display: block; */
 	width: 800px;
 	overflow-x: scroll;
 	scrollbar-width: none;
-	text-align: center;
-
 }
 
 #display_solve_times tbody {
@@ -180,4 +187,8 @@ Line break only using css, don't have to deal with <br> tag
 
 #display_solve_times td, #show_sessions_table td {
 	padding: 5px 10px;
+}
+
+#show_sessions_table td:hover {
+    cursor: pointer;
 }
