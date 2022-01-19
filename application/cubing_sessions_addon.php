@@ -277,7 +277,7 @@
 	}
 	
 	// debug - manual reset
-//     session_destroy();
+    // session_destroy();
 	
 	//                            --- Start of HTML ---
 	
@@ -368,11 +368,7 @@
 	// Debugging with $_POST data
 //     echo '<br>$_POST data: ';
 // 	if (isset($_POST)) print_r($_POST); // debug print $_POST
-//     echo '<br>';
-// 	if (isset($_POST['puzzle_select'])) print_r($_POST['puzzle_select']); // debug print $_POST
-//     echo 'Submit solve pressed: ' . isset($_POST['submit_solve']) . '<br>';
-//     echo 'Submit puzzle pressed: ' . isset($_POST['submit_puzzle']) . '<br>';
-    
+//     echo '<br>'; 
     
 	// Change puzzle type if user selected different puzzle
     if (isset($_POST['submit_puzzle']) && isset($_POST['puzzle_select'])) {
@@ -385,44 +381,46 @@
 	
 	// When confirm button pressed, add time to current puzzle time list
 	
-	// $curr_time_list_name = 3x3_time_list, 2x2_time_list, etc.
-	$curr_time_list_name = $_SESSION['curr_puzzle'] . '_time_list';
+	$curr_time_list_name = $_SESSION['curr_puzzle'] . '_time_list'; // 3x3_time_list, 2x2_time_list, etc.
 // 	echo '<br>$curr_time_list_name: ' . $curr_time_list_name; // debug
 // 	$solve_time_list_len = 1;
 // 	if ($_SESSION[$curr_time_list_name]) $solve_time_list_len = count($_SESSION[$curr_time_list_name]);
 	
-	if (isset($_POST['submit_solve']) && isset($_POST['solve_time']) && $_POST['solve_time'] != '') {
-// 	    echo '<br>Valid time, can submit'; // debug
-// 	       echo '<br>'; // debug
-// 	       print_r($_SESSION[$curr_time_list_name]); // debug
-	    if (isset($_SESSION[$curr_time_list_name])) {
-	        $last_solve_idx = 0;
-	        if (isset($_SESSION[$curr_time_list_name])) {
-	            $last_solve_idx = count($_SESSION[$curr_time_list_name]) - 1;
-	            if ($last_solve_idx == -1) $last_solve_idx++;
-	        }
-// 	        echo '<br>$last_solve_idx: ' . $last_solve_idx; // debug
-// 	        echo '<br>$last solve: ' . $_SESSION[$curr_time_list_name][$last_solve_idx]['solve']; // debug
-	    }
-	    // If solve time stamp is the same, don't add new time
-	    // Check solve time stamp against $_POST time stamp
-// 	    echo '<br>Time stamp from last solve: '; // debug
-// 	    echo $last_solve_timestamp; // debug
-	    // 2nd condition used below for checking different timestamps:
-	    // $_POST['solve_time_timestamp'] != $last_solve_timestamp
-	    if (!isset($_SESSION[$curr_time_list_name]) || $_POST['solve_time'] != $_SESSION[$curr_time_list_name][$last_solve_idx]['solve']) {
-// 	       echo '<br>Time added'; // debug
-	       // When time is added, add solve time stamp, along with solve time
-	       $_SESSION[$curr_time_list_name][] = array('solve' => $_POST['solve_time'],
-	           'timestamp' => $_POST['solve_time_timestamp']);
-	           // TODO: Fix for later: wrong time stamp, its for UTC
-	       
-	       // Update local storage file "cubing_times.json" 
-	       $local_times_a[$_SESSION['curr_puzzle']][] = array('solve' => $_POST['solve_time'],
-	           'timestamp' => $_POST['solve_time_timestamp']);
-	       $local_times_encoded = json_encode($local_times_a);
-	       file_put_contents("./db/cubing_times.json", $local_times_encoded);
-	    }
+	$submitted_not_empty = isset($_POST['submit_solve']) && isset($_POST['solve_time']) && $_POST['solve_time'] != '';
+	if ($submitted_not_empty) {
+		// accepts formats: x:xx.xx, xx.xx, x.xx
+		if (preg_match('/[0-9]+:[0-9]{2}\.[0-9]|[0-9]{1,2}\.[0-9]/', $_POST['solve_time'])) {
+	// 	    echo '<br>Valid time, can submit'; // debug
+	// 	       echo '<br>'; // debug
+	// 	       print_r($_SESSION[$curr_time_list_name]); // debug
+			if (isset($_SESSION[$curr_time_list_name])) {
+				$last_solve_idx = 0; // initializing
+				if (isset($_SESSION[$curr_time_list_name])) {
+					$last_solve_idx = count($_SESSION[$curr_time_list_name]) - 1;
+					if ($last_solve_idx == -1) $last_solve_idx++;
+				}
+	// 	        echo '<br>$last_solve_idx: ' . $last_solve_idx; // debug
+	// 	        echo '<br>$last solve: ' . $_SESSION[$curr_time_list_name][$last_solve_idx]['solve']; // debug
+			}
+			// If solve_time is the same as previous solve, don't add new time
+			// Check solve time stamp against $_POST time stamp
+	// 	    echo '<br>Time stamp from last solve: '; // debug
+	// 	    echo $last_solve_timestamp; // debug
+			// 2nd condition used below for checking against previous solve:
+			if (!isset($_SESSION[$curr_time_list_name]) || $_POST['solve_time'] != $_SESSION[$curr_time_list_name][$last_solve_idx]['solve']) {
+	// 	       echo '<br>Time added'; // debug
+			// When time is added, add solve time stamp, along with solve time
+			$_SESSION[$curr_time_list_name][] = array('solve' => $_POST['solve_time'],
+				'timestamp' => $_POST['solve_time_timestamp']);
+				// TODO: Fix for later: wrong time stamp, its for UTC
+			
+			// Update local storage file "cubing_times.json" 
+			$local_times_a[$_SESSION['curr_puzzle']][] = array('solve' => $_POST['solve_time'],
+				'timestamp' => $_POST['solve_time_timestamp']);
+			$local_times_encoded = json_encode($local_times_a);
+			file_put_contents("./db/cubing_times.json", $local_times_encoded);
+			}
+		}
 	}
 
 	// 						***** Menus/End of Header *****
@@ -482,7 +480,9 @@
 	// If time list is empty, table body will not print
 	if (isset($_SESSION[$curr_time_list_name])) {
 	    
-	    echo '<tbody>';
+		echo '<tbody>';
+		echo '<tr><td></td><td>single</td><td>ao5</td><td>ao12</td></tr>';
+
 	    // Print table with latest times at top
 	    $solve_list_start_idx = count($_SESSION[$curr_time_list_name]) - 1;
 	    for ($solve_num = $solve_list_start_idx; $solve_num >= 0; $solve_num--) {
@@ -491,6 +491,7 @@
 	        echo '<td>' . (int)$solve_num + 1 . '</td>';
 	        echo '<td>' . $_SESSION[$curr_time_list_name][$solve_num]['solve'] . '</td>';
 	        echo '<td>' . ao5($solve_num, $curr_time_list_name) . '</td>';
+	        echo '<td>' . ao12($solve_num, $curr_time_list_name) . '</td>';
 	        echo '</tr>';
 	    }
 	    echo '</tbody>';
@@ -513,7 +514,7 @@
 	echo '</form>';
 	
 	
-	// Update averages display settings
+	// Update averages display (can change in settings)
 	if (isset($_POST['select_ao5_disp']) && $_SESSION['curr_ao5_display'] != $_POST['select_ao5_disp'])
 	    $_SESSION['curr_ao5_display'] = $_POST['select_ao5_disp'];
     if (isset($_POST['select_ao12_disp']) && $_SESSION['curr_ao12_display'] != $_POST['select_ao12_disp'])
