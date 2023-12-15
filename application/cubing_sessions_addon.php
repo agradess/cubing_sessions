@@ -17,10 +17,9 @@
 	 * 
 	 * look into CSS grid layout
 	 * 
-	 * 
-	 * Giving up on for now
-	 * TODO: Stop and start timer with spacebar, use jquery keyboard events
-	 * Created separate program to test out spacebar timing
+	 * TODO: state (session state) for current timing method 'manual' or 'spacebar'
+	 * TODO: put this state in settings
+	 * TODO: be able to display different thing based on settings
 	 * 
 	 */
 
@@ -241,7 +240,9 @@
 	    $_SESSION['visits'] = 1;
 	    // current puzzle times being displayed
 	    $_SESSION['curr_puzzle'] = '3x3';
-	    // current avgs beig displayed
+		// current timing method (currently out of two: 'manual' and 'spacebar')
+	    $_SESSION['curr_timing_method'] = 'manual';
+	    // current avgs beig displayed, the value is the CSS 'display' value
 	    $_SESSION['curr_ao5_display'] = 'inline';
 	    $_SESSION['curr_ao12_display'] = 'inline';
 	    $_SESSION['curr_ao25_display'] = 'none';
@@ -366,33 +367,39 @@
 	//					***** Updating Puzzle Type and Entering New Solves *****
 	
 	// Debugging with $_POST data
-//     echo '<br>$_POST data: ';
-// 	if (isset($_POST)) print_r($_POST); // debug print $_POST
-//     echo '<br>'; 
+	//     echo '<br>$_POST data: ';
+	// 	if (isset($_POST)) print_r($_POST); // debug print $_POST
+	//     echo '<br>'; 
     
 	// Change puzzle type if user selected different puzzle
     if (isset($_POST['submit_puzzle']) && isset($_POST['puzzle_select'])) {
 	    if ($_POST['puzzle_select'] != $_SESSION['curr_puzzle']) {
-// 	    if (isset($_POST['submit_solve'])) {
+	// 	    if (isset($_POST['submit_solve'])) {
             $_SESSION['curr_puzzle'] = $_POST['puzzle_select'];
 	    }
 	}
-// 	echo '$_SESSION["curr_puzzle"]: ' . $_SESSION['curr_puzzle']; // debug
+	// 	echo '$_SESSION["curr_puzzle"]: ' . $_SESSION['curr_puzzle']; // debug
 	
 	// When confirm button pressed, add time to current puzzle time list
 	
 	$curr_time_list_name = $_SESSION['curr_puzzle'] . '_time_list'; // 3x3_time_list, 2x2_time_list, etc.
-// 	echo '<br>$curr_time_list_name: ' . $curr_time_list_name; // debug
-// 	$solve_time_list_len = 1;
-// 	if ($_SESSION[$curr_time_list_name]) $solve_time_list_len = count($_SESSION[$curr_time_list_name]);
+	// 	echo '<br>$curr_time_list_name: ' . $curr_time_list_name; // debug
+	// 	$solve_time_list_len = 1;
+	// 	if ($_SESSION[$curr_time_list_name]) $solve_time_list_len = count($_SESSION[$curr_time_list_name]);
 	
+
+
+	// TODO: add ability to submit with spacebar
+
+
+
 	$submitted_not_empty = isset($_POST['submit_solve']) && isset($_POST['solve_time']) && $_POST['solve_time'] != '';
 	if ($submitted_not_empty) {
 		// accepts formats: x:xx.xx, xx.xx, x.xx
 		if (preg_match('/[0-9]+:[0-9]{2}\.[0-9]|[0-9]{1,2}\.[0-9]/', $_POST['solve_time'])) {
-	// 	    echo '<br>Valid time, can submit'; // debug
-	// 	       echo '<br>'; // debug
-	// 	       print_r($_SESSION[$curr_time_list_name]); // debug
+		// 	    echo '<br>Valid time, can submit'; // debug
+		// 	       echo '<br>'; // debug
+		// 	       print_r($_SESSION[$curr_time_list_name]); // debug
 			if (isset($_SESSION[$curr_time_list_name])) {
 				$last_solve_idx = 0; // initializing
 				if (isset($_SESSION[$curr_time_list_name])) {
@@ -561,6 +568,8 @@
 	echo '</div>';
 	
 //                          -- Internal Scripts --
+	
+	echo '<script src="./spacebar_timer.js"></script>';
 	
 	echo '<script src="../node_modules/scrambo/scrambo.js"></script>';
 	echo '<script>';

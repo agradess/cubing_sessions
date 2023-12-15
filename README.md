@@ -17,7 +17,7 @@ Currently, my timer interface:
 - Lists out current times for a puzzle.
 - Changes puzzle type.
 - Saves times with PHP's global SESSION variables, which persist
-throughout a single browser session.
+  across page renders in a single browser session.
 - Also permanently stores times in a JSON file, as not working with "big" data.
 - Shows/hides desired averages (Ex: average of 5 is abbreviated ao5)
 - Generates scrambles (just for 3x3) using [scrambo](https://www.npmjs.com/package/scrambo).
@@ -29,4 +29,5 @@ The two files beginning with spacebar_timer_test were from several attempts to s
 
 ### Current/Future Additions
 
-N/A
+Currently working on entering times with the spacebar, in addition to entering times
+into a text field. The feature currently works in isolation, see the *_test.js files.
