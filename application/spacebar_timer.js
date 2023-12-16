@@ -15,6 +15,7 @@
      *  - I can grab the time data but I have to send it to the php file
      *  - How am I doing this with the manual input?
      *      - hitting submit button
+     *      - whenever I update the value of the time displayed, update the hidden input
 	 * 
 	 * 
 	 */
@@ -87,9 +88,15 @@ function timerUpdating() {
 
 
 function storeTime(elapsed_hundredths_second) {
-	console.log(`stopping timer at ${get_elapsed_time_string(elapsed_hundredths_second)}`);
+    const solve_time_str = get_elapsed_time_string(elapsed_hundredths_second);
+	console.log(`stopping timer at ${solve_time_str}`);
 
-	solve_time_arr.push({ text: get_elapsed_time_string(elapsed_hundredths_second), hund_int: elapsed_hundredths_second})
+    // NOTE: line below used for debugging purposes, solve_time_arr does not persist
+	solve_time_arr.push({ text: solve_time_str, hund_int: elapsed_hundredths_second})
+
+    var hidden_solve_time = document.querySelector('[name="solve_time"]');
+    hidden_solve_time.value = solve_time_str;
+
 	console.log(solve_time_arr);
 	clearInterval(intervalID);
 }

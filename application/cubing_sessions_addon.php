@@ -169,8 +169,11 @@
 
 		$solve_idx = 0;
 		$session_num = 1;
+		// if ($_SESSION[$curr_time_list][0]['timestamp'] == null)
+		// 	$session_start_date = date_create();
+		// else
 		$session_start_date = date_create($_SESSION[$curr_time_list][0]['timestamp']);
-		$session_start_date = $session_start_date->format('M j'); // Prints: Dec 7
+		$session_start_date = $session_start_date->format('M j, Y'); // Prints: Dec 7
 		$curr_session_len = 0;
 		$session_stats_a = array();
 
@@ -179,8 +182,8 @@
 				// Build table column and send individual session data once clicked
 				$curr_session_len += 1;
 				echo "<td onclick='session_stats(".$session_num.",".json_encode($_SESSION[$curr_time_list]).",".json_encode($session_end_idx).")'>";
-				echo 'Session '.$session_num.'<br>' . $session_start_date.'<br>';
-				echo $curr_session_len.($curr_session_len == 1 ? ' solve' : ' solves').'</td>';
+				echo '<p>Session '.$session_num.'</p><p>' . $session_start_date.'</p>';
+				echo '<p>' . $curr_session_len.($curr_session_len == 1 ? ' solve' : ' solves').'</p></td>';
 				// Median, best single, best mo3, best ao5, best ao12
 				$session_stats_a[] = session_stats($session_num, $curr_time_list, $session_end_idx);				
 
@@ -195,10 +198,12 @@
 				</script>';
 
 				// reset/update counters
-				$session_num += 1;
-				$curr_session_len = 0;
-				$session_start_date = date_create($_SESSION[$curr_time_list][$solve_idx + 1]['timestamp']);
-				$session_start_date = $session_start_date->format('M j');
+				if ($solve_idx < count($_SESSION[$curr_time_list])) {
+					$session_num += 1;
+					$curr_session_len = 0;
+					$session_start_date = date_create($_SESSION[$curr_time_list][$solve_idx + 1]['timestamp']);
+					$session_start_date = $session_start_date->format('M j, Y');	
+				}
 			} else {
 				$curr_session_len += 1;
 			}
@@ -302,7 +307,18 @@
 	echo '<div id="display_settings_screen" class="overlay_screen" style="display:none">';
 	// Content of settings tab
 	echo '<p>Settings</p>';
-	echo '<p style="font-size:14px">Show/Hide Averages:</p>';
+
+	echo '<hr><p style="font-size:14px">Entering Times:</p>';
+
+	echo '<span><form method="post">';
+	echo '<select name="select_timing_method">';
+	echo '<option value="manual">Manual</option>';
+	echo '<option value="spacebar">Spacebar</option>';
+	echo '</select>';
+    echo '<button type="submit" id="toggle_timing_method">Change</button>';
+    echo '</form></span>';
+
+	echo '<hr><p style="font-size:14px">Show/Hide Averages:</p>';
 	
 	echo '<span><form method="post">';
 	echo '<select name="select_ao5_disp">';
@@ -367,9 +383,9 @@
 	//					***** Updating Puzzle Type and Entering New Solves *****
 	
 	// Debugging with $_POST data
-	//     echo '<br>$_POST data: ';
-	// 	if (isset($_POST)) print_r($_POST); // debug print $_POST
-	//     echo '<br>'; 
+	    // echo '<br>$_POST data: ';
+		// if (isset($_POST)) print_r($_POST); // debug print $_POST
+	    // echo '<br>'; 
     
 	// Change puzzle type if user selected different puzzle
     if (isset($_POST['submit_puzzle']) && isset($_POST['puzzle_select'])) {
@@ -507,6 +523,10 @@
 	echo '</table>';
 	echo '</div>';
 	
+	// END of solve table 
+	
+	echo '<div id="timer_main">';
+	
 	echo '<div id="scramble_display"></div>';
 	
 	echo '<div id="submit_times_container">';
@@ -515,9 +535,20 @@
 	// NOT USED: take solve time w/ ajax method and post back to site
 	// Used Instead: Form data, when submitted, returns $_POST data
 	// however solve time comes back, update list
-	echo '<form id="solve_submission_form" method="post">';	
-	echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
-	echo '<button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
+	echo '<form id="solve_submission_form" method="post">';
+
+	// Update timing method (can change in settings)
+	if (isset($_POST['select_timing_method']) && $_SESSION['curr_timing_method'] != $_POST['select_timing_method'])
+	    $_SESSION['curr_timing_method'] = $_POST['select_timing_method'];
+	
+	if ($_SESSION['curr_timing_method'] == 'manual') {
+		echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
+	} else if ($_SESSION['curr_timing_method'] == 'spacebar') {
+		echo '<div id="solve_time">0.00</div>';
+		echo '<input type="hidden" name="solve_time" value="0.00">';
+	}	
+	echo '<br><button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
+	
 	echo '</form>';
 	
 	
@@ -564,6 +595,9 @@
 	// End of 'submit_times_container'
 	echo '</div>';
 	
+	// End of 'timer_main', right side of the screen
+	echo '</div>';
+
 	// End of 'timer', content of the page
 	echo '</div>';
 	

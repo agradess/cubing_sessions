@@ -29,5 +29,5 @@ The two files beginning with spacebar_timer_test were from several attempts to s
 
 ### Current/Future Additions
 
-Currently working on entering times with the spacebar, in addition to entering times
-into a text field. The feature currently works in isolation, see the *_test.js files.
+Adding some finishing touches to the Statistics page! Sessions are broken up by day,
+and a user can look at individual statistics for each session.
