@@ -14,8 +14,6 @@
 	 * Notes to self: -----------------------------------------------------------------
 	 * 
 	 * 
-	 * TODO: needs debugging, only certain events are displaying, if they do not display,
-	 * the entire 'timer' page does not display
 	 * TODO: add inspection countdown
 	 * TODO: add +2 button
 	 * TODO: DNF button (DNF I would need more planning)
@@ -176,7 +174,7 @@
 	// For each session, list number of solves, date started 
 	function show_sessions() {
 
-		echo 'calling show_sessions(), displaying sessions page'; // NOTE debug
+		// echo 'calling show_sessions(), displaying sessions page'; // NOTE debug
 
 		$curr_time_list = $_SESSION['curr_puzzle'] . '_time_list';
 		$session_end_idx = find_session_idxs($_SESSION[$curr_time_list]);
@@ -188,8 +186,15 @@
 
 		$solve_idx = 0;
 		$session_num = 1;
-		$session_start_date = date_create($_SESSION[$curr_time_list][0]['timestamp']);
-		$session_start_date = $session_start_date->format('M j, Y'); // Prints: Dec 7, 2023
+		$session_start_date = null;
+		if ($_SESSION[$curr_time_list][0]['timestamp'] != null) {
+			$session_start_date = date_create($_SESSION[$curr_time_list][0]['timestamp']);
+			$session_start_date = $session_start_date->format('M j, Y'); // Prints: Dec 7, 2023
+		} else {
+			// display td with some text denoting that no statistics are calculated since
+			// the user has not submitted any solves yet
+			echo '<td>No solves yet! Come back after you\'ve done some practice.</td>';
+		}
 		$curr_session_len = 0;
 		$session_stats_a = array();
 
@@ -231,18 +236,21 @@
 
 		echo '</tr></tbody></table>';
 		echo '<div id="session_graph"></div>';
-		$session_idx = 0;
-		$worst_solve = max($_SESSION[$curr_time_list])['solve'];
 		echo '<div id="session_stats_wrapper"><p id="session_stats_desc">Median and Best Stats</p>';
-		foreach ($session_stats_a as $session_stats) {
-			echo '<div class="session_stats" id="session_'.$session_idx.'_stats" style="display:none">';
-			echo 'Median: '.$session_stats['median'].'<br>';
-			echo 'Best single: '.$session_stats['b_single'];
-			if ($session_stats['b_mo3'] != $worst_solve) echo '<br>'.'Best mo3: '.$session_stats['b_mo3'];
-			if ($session_stats['b_ao5'] != $worst_solve) echo '<br>'.'Best ao5: '.$session_stats['b_ao5'];
-			if ($session_stats['b_ao12'] != $worst_solve) echo '<br>'.'Best ao12: '.$session_stats['b_ao12'];
-			echo '</div>';
-			$session_idx += 1;
+		
+		if (count($session_stats_a) != 0) {
+			$session_idx = 0;
+			$worst_solve = max($_SESSION[$curr_time_list])['solve'];
+			foreach ($session_stats_a as $session_stats) {
+				echo '<div class="session_stats" id="session_'.$session_idx.'_stats" style="display:none">';
+				echo 'Median: '.$session_stats['median'].'<br>';
+				echo 'Best single: '.$session_stats['b_single'];
+				if ($session_stats['b_mo3'] != $worst_solve) echo '<br>'.'Best mo3: '.$session_stats['b_mo3'];
+				if ($session_stats['b_ao5'] != $worst_solve) echo '<br>'.'Best ao5: '.$session_stats['b_ao5'];
+				if ($session_stats['b_ao12'] != $worst_solve) echo '<br>'.'Best ao12: '.$session_stats['b_ao12'];
+				echo '</div>';
+				$session_idx += 1;
+			}
 		}
 		echo '</div>';
 		echo '</div>'; // closing tag for 'show_sessions_cont'
@@ -316,7 +324,7 @@
 		} else {
 			$_SESSION[$session_idx] = $local_times_a[$event];
 		}
-		echo count($_SESSION[$session_idx]) . '<br><br>'; // NOTE debug
+		// echo count($_SESSION[$session_idx]) . '<br><br>'; // NOTE debug
 	}
 	
 	// debug - manual reset
@@ -407,10 +415,14 @@
 	//					***** Updating Puzzle Type and Entering New Solves *****
 	
 	// Debugging with $_POST data
-	    echo '<br>$_POST data: ';
-		if (isset($_POST)) print_r($_POST); // debug print $_POST
-	    echo '<br>'; 
-    
+	    // if (isset($_POST)) {
+		// 	echo '<br>$_POST data: ';
+		// 	print_r($_POST);
+		// 	echo '<br>'; 
+		// } else {
+		// 	echo '<br>No data in $_POST<br>';
+		// }
+		
 	// Change puzzle type if user selected different puzzle
     if (isset($_POST['submit_puzzle']) && isset($_POST['puzzle_select'])) { // NOTE puzzle type changed here
 	    if ($_POST['puzzle_select'] != $_SESSION['curr_puzzle']) {
