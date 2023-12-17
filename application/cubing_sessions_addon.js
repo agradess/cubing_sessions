@@ -50,6 +50,11 @@ function js_display_1_session(session_num, curr_time_lst, session_end_idxs) {
 	// for (session_stats in session_stats_tags) session_stats.style.display = 'none';
 	session_stats_to_show = document.getElementById('session_' + session_num + '_stats');
 	session_stats_to_show.style.display = 'block';
+
+	// also set current session in the table to be selected, and all others not selected
+	let session_td_list = document.querySelectorAll('#show_sessions_table td');
+	for (var i = 0; i < session_td_list.length; i++) session_td_list[i].classList.remove('session_selected');
+	session_td_list[session_num].classList.add('session_selected');
 }
 
 // Pressing enter intentionally does not work to enter a solve time

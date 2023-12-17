@@ -129,6 +129,7 @@ button:active {
 
 #display_settings_screen button {
 	margin: 5px;
+	padding: 5px 10px;
 } 
 
 #display_settings_screen button:hover {
@@ -167,6 +168,8 @@ Line break only using css, don't have to deal with <br> tag
 #display_solve_times {
 	display: block;
 	float: left;
+	box-shadow: 0px 3px 7.5px rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
 }
 
 #show_sessions_cont {
@@ -176,7 +179,9 @@ Line break only using css, don't have to deal with <br> tag
 
 #show_sessions_table {
 	background-color: #13766a; /* same color as settings screen */
+	border-radius: 10px 10px 0px 0px;
 	text-align: center;
+	box-shadow: 0px 3px 7.5px rgba(0, 0, 0, 0.1);
 }
 
 #show_sessions_table tbody {
@@ -189,12 +194,20 @@ Line break only using css, don't have to deal with <br> tag
 	scrollbar-width: none;
 }
 
-#show_sessions_table tbody::-webkit-scrollbar {
+#show_sessions_table tbody::-webkit-scrollbar,
+#display_solve_times tbody::-webkit-scrollbar {
     display: none;
 }
 
-#display_solve_times thead {
+#display_solve_times thead td {
 	border: none;
+	text-align: center;
+	border-radius: 10px;
+}
+
+#submit_puzzle_button {
+	margin-inline: 10px;
+	width: 100px;
 }
 
 #display_solve_times tbody {
@@ -202,6 +215,7 @@ Line break only using css, don't have to deal with <br> tag
 	height: 400px;
 	font-size: 14px;
 	overflow-y: scroll;
+	border-radius: 0px 0px 10px 10px;
 }
 
 #display_solve_times, #display_solve_times td {
@@ -218,9 +232,33 @@ Line break only using css, don't have to deal with <br> tag
 
 #show_sessions_table td {
 	min-width: 150px;
+	border-radius: 10px;
 }
 
 #show_sessions_table td:hover {
     cursor: pointer;
 	background-color: #0c5e55;
+}
+
+.session_selected {
+	background-color: #0c5e55;
+}
+
+#session_stats_wrapper {
+	/* for now, as I only have these statistics */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	min-height: 200px;
+	padding: 15px;
+	background-color: #0c5e55;
+	border-radius: 0px 0px 10px 10px;
+	box-shadow: 0px 3px 7.5px rgba(0, 0, 0, 0.1);
+}
+
+#session_stats_desc {
+	font-size: 20px;
+	font-weight: 600;
+	color: #19897c;
 }

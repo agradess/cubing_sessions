@@ -3,7 +3,7 @@
 	 * Add-On for Cubing "Sessions Within Sessions"
 	 * 
 	 * Author: Adam Gradess
-	 * Last Updated: 1/12/2021
+	 * Last Updated: 12/17/2023
 	 * 
 	 * Started: 6/29/2021
 	 * During the end of the first month of the Tayrex internship.
@@ -13,14 +13,30 @@
 	 * 
 	 * Notes to self: -----------------------------------------------------------------
 	 * 
-	 * look into $_COOKIE, and difference between cookie and sessions
+	 * 
+	 * TODO: needs debugging, only certain events are displaying, if they do not display,
+	 * the entire 'timer' page does not display
+	 * TODO: add inspection countdown
+	 * TODO: add +2 button
+	 * TODO: DNF button (DNF I would need more planning)
+	 * 
+	 *  
+	 * look into $_COOKIE, and difference between cookie and sessions:
+	 * - $_COOKIE: Sent by the server *to the browser, which it then stores
+	 * 		as files on the user's computer.* Can be removed by the user.
+	 * 		More specifically, cookies are sent to the php script by HTTP Cookies
+	 * 		This is good for data that needs to be accessed over multiple visits,
+	 * 		multiple sessions.
+	 * 		Note: set cookie signature is setcookie(str $name, mixed value, [expiration time])
+	 * - $_SESSION: a way to store user data to be used across multiple pages
+	 * 		the server creates a new session id, stores it as a cookie *on the server, then deleted
+	 * 		when the user closes the browser.*
+	 * 		Used for storing temporary data for one user and one browser session.
+	 * 		Note: session_start() needs to be called before storing any session variables.
 	 * 
 	 * look into CSS grid layout
 	 * 
-	 * TODO: state (session state) for current timing method 'manual' or 'spacebar'
-	 * TODO: put this state in settings
-	 * TODO: be able to display different thing based on settings
-	 * 
+	 *  
 	 */
 
     // manually remove warnings
@@ -89,7 +105,7 @@
     }
     
     // TODO: Depends on the event?
-    // Determine the indexes at which sessions were ended
+    // Determines the indexes of the solves at which sessions were ended
     // $solve_time_list: array
     // $max_time_diff: int, default - 30 min
     function find_session_idxs($solve_time_list, $max_time_diff = 30) {
@@ -159,6 +175,9 @@
 	// For the current puzzle:
 	// For each session, list number of solves, date started 
 	function show_sessions() {
+
+		echo 'calling show_sessions(), displaying sessions page'; // NOTE debug
+
 		$curr_time_list = $_SESSION['curr_puzzle'] . '_time_list';
 		$session_end_idx = find_session_idxs($_SESSION[$curr_time_list]);
 		
@@ -169,11 +188,8 @@
 
 		$solve_idx = 0;
 		$session_num = 1;
-		// if ($_SESSION[$curr_time_list][0]['timestamp'] == null)
-		// 	$session_start_date = date_create();
-		// else
 		$session_start_date = date_create($_SESSION[$curr_time_list][0]['timestamp']);
-		$session_start_date = $session_start_date->format('M j, Y'); // Prints: Dec 7
+		$session_start_date = $session_start_date->format('M j, Y'); // Prints: Dec 7, 2023
 		$curr_session_len = 0;
 		$session_stats_a = array();
 
@@ -198,12 +214,14 @@
 				</script>';
 
 				// reset/update counters
-				if ($solve_idx < count($_SESSION[$curr_time_list])) {
-					$session_num += 1;
-					$curr_session_len = 0;
+				$session_num += 1;
+				$curr_session_len = 0;
+				if ($_SESSION[$curr_time_list][$solve_idx + 1]['timestamp'] != null) {
 					$session_start_date = date_create($_SESSION[$curr_time_list][$solve_idx + 1]['timestamp']);
-					$session_start_date = $session_start_date->format('M j, Y');	
+				} else {
+					$session_start_date = date_create($_SESSION[$curr_time_list][$solve_idx]['timestamp']);
 				}
+				$session_start_date = $session_start_date->format('M j, Y');	
 			} else {
 				$curr_session_len += 1;
 			}
@@ -215,22 +233,38 @@
 		echo '<div id="session_graph"></div>';
 		$session_idx = 0;
 		$worst_solve = max($_SESSION[$curr_time_list])['solve'];
+		echo '<div id="session_stats_wrapper"><p id="session_stats_desc">Median and Best Stats</p>';
 		foreach ($session_stats_a as $session_stats) {
-			echo '<p class="session_stats" id="session_'.$session_idx.'_stats" style="display:none">';
+			echo '<div class="session_stats" id="session_'.$session_idx.'_stats" style="display:none">';
 			echo 'Median: '.$session_stats['median'].'<br>';
 			echo 'Best single: '.$session_stats['b_single'];
 			if ($session_stats['b_mo3'] != $worst_solve) echo '<br>'.'Best mo3: '.$session_stats['b_mo3'];
 			if ($session_stats['b_ao5'] != $worst_solve) echo '<br>'.'Best ao5: '.$session_stats['b_ao5'];
 			if ($session_stats['b_ao12'] != $worst_solve) echo '<br>'.'Best ao12: '.$session_stats['b_ao12'];
-			echo '</p>';
+			echo '</div>';
 			$session_idx += 1;
 		}
+		echo '</div>';
 		echo '</div>'; // closing tag for 'show_sessions_cont'
 	}
-    
-    
-    //              ***** Initialize variables for start of session *****
+
 	
+	//                            --- Start of HTML ---
+	
+	echo '<!DOCTYPE html>';
+	echo '<html>';
+	
+	echo '<head>';
+	   echo '<title>PA Sponsored Rubik\'s Cube Timer | by Adam Gradess</title>';
+	   echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>';
+	   echo '<link href="http://fonts.cdnfonts.com/css/aller" rel="stylesheet">';
+	   echo '<link rel="stylesheet" type="text/css" href="stylesheets/cubing_sessions_addon.css" />';
+	echo '</head>';
+	
+	echo '<body>';	
+
+
+    //              ***** Initialize variables for start of browser session *****
 	
 	session_start();
     
@@ -260,45 +294,36 @@
 	     * [(1) => [solve => 3.45, timestamp => 23 Jul ...], (2) => [...], ...]
 	     * 
 	     */
-	    	    	    
-	    // For a new session, assign times db contents to session variables
-	    $event_list = array('3x3','2x2','4x4','5x5','6x6','7x7','OH','BLD','FT','Mega','Pyra','Skewb','Sq-1','Clock','4BLD','5BLD','MBLD');
-	    
-	    foreach ($event_list as $event) {
-	        $session_idx = $event . "_time_list";
-	        if (!isset($local_times_a[$event])) {
-	            $_SESSION[$session_idx] = array();
-	        } else {
-    	        $_SESSION[$session_idx] = $local_times_a[$event];
-    	    }
-	    }
 	    
 	    // reset form/POST data at beginning of each session
 	    unset($_POST);
-	    // Keeps track of when the user submitted a solve, for updating 3x3_time_list
+	    // Keeps track of when the user submitted a solve, for updating lists of solve times
 // 	    $_SESSION['is_solve_submitted'] = false;
 	} else {
 	    // Otherwise update variables for a new page visit
 	    $_SESSION['visits']++;
 	}
+
+	// Assign times db contents to session variables each time page is reloaded
+	$event_list = array('3x3','2x2','4x4','5x5','6x6','7x7','OH','BLD','FT','Mega','Pyra','Skewb','Sq-1','Clock','4BLD','5BLD','MBLD');
+	    
+	echo 'test<br>';
+
+	foreach ($event_list as $event) {
+		$session_idx = $event . "_time_list";
+		if (!isset($local_times_a[$event])) {
+			$_SESSION[$session_idx] = array(); // NOTE if the event does not have any times, starts out as empty array
+		} else {
+			$_SESSION[$session_idx] = $local_times_a[$event];
+		}
+		echo count($_SESSION[$session_idx]) . '<br><br>'; // NOTE debug
+	}
 	
 	// debug - manual reset
     // session_destroy();
-	
-	//                            --- Start of HTML ---
-	
-	echo '<!DOCTYPE html>';
-	echo '<html>';
-	
-	echo '<head>';
-	   echo '<title>PA Sponsored Rubik\'s Cube Timer (sike) | by Adam Gradess</title>';
-	   echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>';
-	   echo '<link href="http://fonts.cdnfonts.com/css/aller" rel="stylesheet">';
-	   echo '<link rel="stylesheet" type="text/css" href="stylesheets/cubing_sessions_addon.css" />';
-	echo '</head>';
-	
-	echo '<body>';	
-		
+			
+
+
 	// created overlay element for settings, see css overlay class
 	
 	echo '<div id="display_settings" class="overlay_background" style="display:none">';
@@ -370,7 +395,6 @@
     echo '<span class="menu_actions">Home</span>';
     echo '<span><button class="menu_actions" id="timer_page_button">Timer</button></span>';
     echo '<span><button class="menu_actions" id="stats_menu_button">Statistics</button></span>';
-//     echo '<span class="menu_actions"><button id="settings_menu_button">Settings</button></span>';
     echo '<span><button class="menu_actions" id="settings_menu_button">Settings</button></span>';
 	// Web Design Link: (keeping for reference)
 	// echo '<span class="menu_actions"><a';
@@ -383,19 +407,18 @@
 	//					***** Updating Puzzle Type and Entering New Solves *****
 	
 	// Debugging with $_POST data
-	    // echo '<br>$_POST data: ';
-		// if (isset($_POST)) print_r($_POST); // debug print $_POST
-	    // echo '<br>'; 
+	    echo '<br>$_POST data: ';
+		if (isset($_POST)) print_r($_POST); // debug print $_POST
+	    echo '<br>'; 
     
 	// Change puzzle type if user selected different puzzle
-    if (isset($_POST['submit_puzzle']) && isset($_POST['puzzle_select'])) {
+    if (isset($_POST['submit_puzzle']) && isset($_POST['puzzle_select'])) { // NOTE puzzle type changed here
 	    if ($_POST['puzzle_select'] != $_SESSION['curr_puzzle']) {
 	// 	    if (isset($_POST['submit_solve'])) {
             $_SESSION['curr_puzzle'] = $_POST['puzzle_select'];
 	    }
 	}
-	// 	echo '$_SESSION["curr_puzzle"]: ' . $_SESSION['curr_puzzle']; // debug
-	
+		
 	// When confirm button pressed, add time to current puzzle time list
 	
 	$curr_time_list_name = $_SESSION['curr_puzzle'] . '_time_list'; // 3x3_time_list, 2x2_time_list, etc.
@@ -403,15 +426,10 @@
 	// 	$solve_time_list_len = 1;
 	// 	if ($_SESSION[$curr_time_list_name]) $solve_time_list_len = count($_SESSION[$curr_time_list_name]);
 	
-
-
-	// TODO: add ability to submit with spacebar
-
-
-
 	$submitted_not_empty = isset($_POST['submit_solve']) && isset($_POST['solve_time']) && $_POST['solve_time'] != '';
 	if ($submitted_not_empty) {
 		// accepts formats: x:xx.xx, xx.xx, x.xx
+		echo 'There is a time to submit<br>';
 		if (preg_match('/[0-9]+:[0-9]{2}\.[0-9]|[0-9]{1,2}\.[0-9]/', $_POST['solve_time'])) {
 		// 	    echo '<br>Valid time, can submit'; // debug
 		// 	       echo '<br>'; // debug
@@ -458,6 +476,7 @@
 	
     // Print out a table with the times, they update as times are added
 	// 2 rows, first row is solve #, second is the time list
+
 	echo '<table id="display_solve_times">';
 	
 	echo '<thead>';
@@ -467,7 +486,7 @@
 
     // change puzzle type
     echo '<form method="post" id="select_puzzle_form">';
-    echo 'Event: '.$_SESSION['curr_puzzle'].'<br>';
+    echo '<span style="margin-block:15px;font-size:20px">'.$_SESSION['curr_puzzle'].'<span><br>';
     echo '<select id="puzzle_select" name="puzzle_select">';
 //     echo '<select id="puzzle_select" name="puzzle_select" value=\"'.$_SESSION['curr_puzzle'].'\">';
     echo '<option value="3x3">3x3</option>';
@@ -490,7 +509,7 @@
 	
 	echo '</select>';                                        // date fmt: 24 Aug 2021 3:46 PM
 	echo '<input type="hidden" name="solve_time_timestamp" value="'.date('d M Y h:i:s a').'">'; // hidden timestamp
-	echo '<br><button type="submit" name="submit_puzzle">Change<br>Event</button>';
+	echo '<button type="submit" id="submit_puzzle_button" name="submit_puzzle">Change Event</button>';
 	echo '<form>';
 	
 	
@@ -500,13 +519,13 @@
 	
 	// Fill in the solve times table
 
-	// If time list is empty, table body will not print
-	if (isset($_SESSION[$curr_time_list_name])) {
 	    
-		echo '<tbody>';
-		echo '<tr><td></td><td>single</td><td>ao5</td><td>ao12</td></tr>';
+	echo '<tbody>';
+	echo '<tr><td></td><td>single</td><td>ao5</td><td>ao12</td></tr>';
 
-	    // Print table with latest times at top
+	// If time list is empty, table body will not print
+	if (isset($_SESSION[$curr_time_list_name]) && count($_SESSION[$curr_time_list_name]) > 0) {
+			// Print table with latest times at top
 	    $solve_list_start_idx = count($_SESSION[$curr_time_list_name]) - 1;
 	    for ($solve_num = $solve_list_start_idx; $solve_num >= 0; $solve_num--) {
 	        
@@ -517,14 +536,16 @@
 	        echo '<td>' . ao12($solve_num, $curr_time_list_name) . '</td>';
 	        echo '</tr>';
 	    }
-	    echo '</tbody>';
 	}
+	
+	echo '</tbody>';
+	
 	
 	echo '</table>';
 	echo '</div>';
 	
 	// END of solve table 
-	
+// /* NOTE debug trying to see where changing puzzle affects the page	
 	echo '<div id="timer_main">';
 	
 	echo '<div id="scramble_display"></div>';
@@ -597,6 +618,8 @@
 	
 	// End of 'timer_main', right side of the screen
 	echo '</div>';
+
+// */ // NOTE debug trying to see where changing puzzle affects the page
 
 	// End of 'timer', content of the page
 	echo '</div>';
