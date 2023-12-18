@@ -314,8 +314,6 @@
 
 	// Assign times db contents to session variables each time page is reloaded
 	$event_list = array('3x3','2x2','4x4','5x5','6x6','7x7','OH','BLD','FT','Mega','Pyra','Skewb','Sq-1','Clock','4BLD','5BLD','MBLD');
-	    
-	echo 'test<br>';
 
 	foreach ($event_list as $event) {
 		$session_idx = $event . "_time_list";

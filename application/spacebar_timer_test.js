@@ -1,34 +1,6 @@
-/*
-4 states:
-
-spacebar down, timer not running
-spacebar released, timer running
-spacebar down, timer running
-spacebar released, timer not running
-*/
-
-
-// installing javascript code from github:
-// https://www.youtube.com/watch?v=635N7rU5aPo
-
-// var { Timer } = require("easytimer.js").Timer;
-// var timerInstance = new Timer();
-
-// import Timer from "../easytimer_dir/src/easytimer/easytimer.js";
-// const timer = new Timer();
-
-/*
-Failed attempt at using keypress...DO NOT TOUCH
-
-$(document).keypress(function(event) {
-	if (event.which == 70) {
-    	// document.getElementById('test').innerHTML = 'haha!';
-		console.log('aha!');
- 	}
- });
-*/
 
 let timing = false;
+let inspecting = false; // addition
 let spacebar_down = false;
 let timer_started_date = undefined;
 
@@ -36,8 +8,6 @@ let intervalID = 0;
 let elapsed_hundredths_second = 0;
 let solve_time_arr = [];
 
-// var time_recorded = false; // TODO: Added this field for keeping the time **removed
-// when you stop the timer. Now, keyup does not do anything
 
 // When spacebar is pressed down
 $(document).on('keydown',function(e) {
@@ -45,17 +15,22 @@ $(document).on('keydown',function(e) {
 		var solve_time = document.getElementById('solve_time');
 		spacebar_down = true;
 		
-		if (solve_time.innerHTML == '0.00') { // not sure why this check is here
-			// alert('time is 0.00');
-			solve_time.style.color = '#34eb43';
-		} else {
+		// if (solve_time.innerHTML == '0.00') { // not sure why this check is here
+		// 	// alert('time is 0.00');
+		// 	solve_time.style.color = '#34eb43';
+		// } else {
 			if (!timing) {
 				solve_time.innerHTML = '0.00';
-				solve_time.style.color = '#34eb43';
+				if (!inspecting) {
+					solve_time.style.color = '#ff4545'; // red
+				} else {
+					clearInterval(intervalID);
+					solve_time.style.color = '#34eb43'; // green
+				}
 			} else {
 				storeTime(elapsed_hundredths_second);
 			}
-		}
+		// }
     }
 });
 
@@ -72,10 +47,16 @@ $(document).keyup(function(e) {
 		var solve_time = document.getElementById('solve_time');
 		console.log(solve_time);
 		spacebar_down = true;		
-		solve_time.style.color = '#ffffff';
 		
 		if (!timing) {
-			timing = true;
+			if (!inspecting) {
+				inspecting = true;
+				startInspection();				
+			} else {
+				inspecting = false;
+				timing = true;
+				solve_time.style.color = '#ffffff';
+			}
 		} else {
 			timing = false;
 		}
@@ -92,9 +73,25 @@ $(document).keyup(function(e) {
 	}
 });
 
-// This is where the time is updated
+function startInspection() {
+	document.getElementById("solve_time").innerHTML = "15.00";
+	
+	// will see if this has to be a global value later
+	let inspection_remaining = 1500;
+	intervalID = setInterval(function() {
+		inspection_remaining -= 1;
+
+		if (inspection_remaining >= 0)
+			solve_time.innerHTML = get_elapsed_time_string(inspection_remaining);
+		else if (inspection_remaining >= -200 && inspection_remaining < 0)
+			solve_time.innerHTML = "+2";
+		else
+			solve_time.innerHTML = "DNF"; 
+	}, 10);
+}
+
+// This is where the time is updated every hundreth of a second
 function timerUpdating(solve_time_start_date) {
-	document.getElementById("solve_time").innerHTML = "0.01";
 	// at every hundreth of a second, calculate the difference in time between
 	// param and date.now()
 
@@ -160,66 +157,34 @@ function get_elapsed_time_string(total_hundr_seconds) {
   return currentTimeString;
 }
 
+
 /*
 
-$(document).keyup(function(e) {
-	if(e.which == 32) { // Spacebar
-			
-			
-			// 1. clearInterval is global
-			// 2. Store the end value of the time in a different variable, display that
-			// variable, then clear the interval
-			
-			var solve_time = document.getElementById('solve_time');
-//			solve_time.style.color = '#ffffff'; 	// color change, ignore for now
+Current logic:
 
-			var elapsed_hundredths_second = 0;
-			
-			var intervalID = setInterval(function() {
-				elapsed_hundredths_second = elapsed_hundredths_second + 1;
-				solve_time.innerHTML = get_elapsed_time_string(elapsed_hundredths_second);
-			}, 10);
-				
-			if (!timing) {
-				timing = true;
-				
-				console.log('Timing');
-				
-			} else {
-				// stop timing
-				timing = false;
-				clearInterval(intervalID);
-				solve_time.innerHTML == '0.00';
-			}
-	}
-});
-*/
-/*
-$(document).keyup(function(e) {
-	if(e.which == 32) { // Spacebar
-		// alert('Spacebar released');
-			
-			var solve_time = document.getElementById('solve_time');
-			
-//			solve_time.style.color = '#ffffff'; 	// color change, ignore for now
-			timing = true;
-			
-			// grab current time in minutes seconds milliseconds
-			// const start = Date.now();
-			if (timing) {
-				console.log('Timing');
-				var elapsed_hundredths_second = 0;
-				
-				var intervalID = setInterval(function() {
-					elapsed_hundredths_second = elapsed_hundredths_second + 1;
-					solve_time.innerHTML = get_elapsed_time_string(elapsed_hundredths_second);
-				}, 10);
-				
-				$(document).keydown(function(e) {
-					if (e.which == 32) clearInterval(intervalID);
-				});
-			}
-	}
-});
-*/
+4 states:
 
+spacebar down, timer not running, !timing:
+	TODO:
+	not inspecting
+		text turns red
+		text resets to "0.00"
+	TODO:
+	inspecting
+		text turns green
+		text resets to "0.00"
+spacebar released, timer running, timing:
+	'timing variable' set to false
+spacebar down, timer running:
+	text stops updating
+spacebar released, timer not running, !timing:
+	TODO:
+	if not inspecting (I am starting the solve)
+		set inspecting to true
+		set text to 15.00
+		inspection countdown starts
+	TODO:
+	if inspecting (I am just starting inspection)
+		set inspecting to false
+		timer starts updating
+*/

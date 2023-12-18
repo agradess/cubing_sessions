@@ -17,6 +17,7 @@ echo '<p>Wow, look, it is a working spacebar timer:</p>';
 echo '<div id="solve_time">0.00</div>';
 // echo '<div id="solve_time_test" onClick=get_elapsed_time_string(408101)>0.00</div>';
 echo '<button type="submit" name="submit_solve">Submit</button>';
+echo '<p>Last updated by Adam Gradess on Dec 17 2023.</p>';
 echo '</form>';
 
 echo '</body>';
