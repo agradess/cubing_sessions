@@ -187,4 +187,5 @@ spacebar released, timer not running, !timing:
 	if inspecting (I am just starting inspection)
 		set inspecting to false
 		timer starts updating
+		yuh
 */
