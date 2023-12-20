@@ -7,14 +7,12 @@
 	 * 
 	 * Started: 6/29/2021
 	 * During the end of the first month of the Tayrex internship.
-	 * Four more score and seven five seconds of summer ago.
+	 * Many moons ago.
 	 * 
 	 * Making my own Rubik's Cube timer interface with PHP, JS, CSS.
 	 * 
 	 * Notes to self: -----------------------------------------------------------------
 	 * 
-	 * 
-	 * TODO: add inspection countdown
 	 * TODO: add +2 button
 	 * TODO: DNF button (DNF I would need more planning)
 	 * 
@@ -38,7 +36,7 @@
 	 */
 
     // manually remove warnings
-    error_reporting(E_ALL & ~E_WARNING);
+    // error_reporting(E_ALL & ~E_WARNING);
 
     //                      --- Functions ---
 
@@ -263,7 +261,7 @@
 	echo '<html>';
 	
 	echo '<head>';
-	   echo '<title>PA Sponsored Rubik\'s Cube Timer | by Adam Gradess</title>';
+	   echo '<title>Rubik\'s Cube Timer | by Adam Gradess</title>';
 	   echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>';
 	   echo '<link href="http://fonts.cdnfonts.com/css/aller" rel="stylesheet">';
 	   echo '<link rel="stylesheet" type="text/css" href="stylesheets/cubing_sessions_addon.css" />';
@@ -432,44 +430,30 @@
 	// When confirm button pressed, add time to current puzzle time list
 	
 	$curr_time_list_name = $_SESSION['curr_puzzle'] . '_time_list'; // 3x3_time_list, 2x2_time_list, etc.
-	// 	echo '<br>$curr_time_list_name: ' . $curr_time_list_name; // debug
-	// 	$solve_time_list_len = 1;
-	// 	if ($_SESSION[$curr_time_list_name]) $solve_time_list_len = count($_SESSION[$curr_time_list_name]);
 	
 	$submitted_not_empty = isset($_POST['submit_solve']) && isset($_POST['solve_time']) && $_POST['solve_time'] != '';
 	if ($submitted_not_empty) {
 		// accepts formats: x:xx.xx, xx.xx, x.xx
-		echo 'There is a time to submit<br>';
 		if (preg_match('/[0-9]+:[0-9]{2}\.[0-9]|[0-9]{1,2}\.[0-9]/', $_POST['solve_time'])) {
-		// 	    echo '<br>Valid time, can submit'; // debug
-		// 	       echo '<br>'; // debug
-		// 	       print_r($_SESSION[$curr_time_list_name]); // debug
 			if (isset($_SESSION[$curr_time_list_name])) {
 				$last_solve_idx = 0; // initializing
 				if (isset($_SESSION[$curr_time_list_name])) {
 					$last_solve_idx = count($_SESSION[$curr_time_list_name]) - 1;
 					if ($last_solve_idx == -1) $last_solve_idx++;
 				}
-	// 	        echo '<br>$last_solve_idx: ' . $last_solve_idx; // debug
-	// 	        echo '<br>$last solve: ' . $_SESSION[$curr_time_list_name][$last_solve_idx]['solve']; // debug
 			}
-			// If solve_time is the same as previous solve, don't add new time
-			// Check solve time stamp against $_POST time stamp
-	// 	    echo '<br>Time stamp from last solve: '; // debug
-	// 	    echo $last_solve_timestamp; // debug
+			// If $_POST['solve_time'] is the same as previous solve, don't add new time
 			// 2nd condition used below for checking against previous solve:
 			if (!isset($_SESSION[$curr_time_list_name]) || $_POST['solve_time'] != $_SESSION[$curr_time_list_name][$last_solve_idx]['solve']) {
-	// 	       echo '<br>Time added'; // debug
-			// When time is added, add solve time stamp, along with solve time
-			$_SESSION[$curr_time_list_name][] = array('solve' => $_POST['solve_time'],
-				'timestamp' => $_POST['solve_time_timestamp']);
-				// TODO: Fix for later: wrong time stamp, its for UTC
-			
-			// Update local storage file "cubing_times.json" 
-			$local_times_a[$_SESSION['curr_puzzle']][] = array('solve' => $_POST['solve_time'],
-				'timestamp' => $_POST['solve_time_timestamp']);
-			$local_times_encoded = json_encode($local_times_a);
-			file_put_contents("./db/cubing_times.json", $local_times_encoded);
+				// When time is added, add solve time stamp, along with solve time
+				$_SESSION[$curr_time_list_name][] = array('solve' => $_POST['solve_time'] + $_POST['solve_penalty'],
+					'timestamp' => $_POST['solve_time_timestamp']);
+				
+				// Update local storage file "cubing_times.json" 
+				$local_times_a[$_SESSION['curr_puzzle']][] = array('solve' => $_POST['solve_time'] + $_POST['solve_penalty'],
+					'timestamp' => $_POST['solve_time_timestamp']);
+				$local_times_encoded = json_encode($local_times_a);
+				file_put_contents("./db/cubing_times.json", $local_times_encoded);
 			}
 		}
 	}
@@ -516,9 +500,12 @@
 	echo '<option value="4BLD">4BLD</option>';
 	echo '<option value="5BLD">5BLD</option>';
 	echo '<option value="MBLD">MBLD</option>';
+	echo '</select>';
 	
-	echo '</select>';                                        // date fmt: 24 Aug 2021 3:46 PM
-	echo '<input type="hidden" name="solve_time_timestamp" value="'.date('d M Y h:i:s a').'">'; // hidden timestamp
+	// hidden timestamp, format: 24 Aug 2021 3:46 PM
+	$est_utc_diff = DateInterval::createFromDateString("6 hours");
+	$est_datetime = date_create(date('d M Y h:i:s a'))->sub($est_utc_diff);
+	echo '<input type="hidden" name="solve_time_timestamp" value="'.$est_datetime->format('d M Y h:i:s a').'">';
 	echo '<button type="submit" id="submit_puzzle_button" name="submit_puzzle">Change Event</button>';
 	echo '<form>';
 	
@@ -555,7 +542,6 @@
 	echo '</div>';
 	
 	// END of solve table 
-// /* NOTE debug trying to see where changing puzzle affects the page	
 	echo '<div id="timer_main">';
 	
 	echo '<div id="scramble_display"></div>';
@@ -568,17 +554,20 @@
 	// however solve time comes back, update list
 	echo '<form id="solve_submission_form" method="post">';
 
-	// Update timing method (can change in settings)
-	if (isset($_POST['select_timing_method']) && $_SESSION['curr_timing_method'] != $_POST['select_timing_method'])
-	    $_SESSION['curr_timing_method'] = $_POST['select_timing_method'];
-	
-	if ($_SESSION['curr_timing_method'] == 'manual') {
-		echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
-	} else if ($_SESSION['curr_timing_method'] == 'spacebar') {
-		echo '<div id="solve_time">0.00</div>';
-		echo '<input type="hidden" name="solve_time" value="0.00">';
-	}	
-	echo '<br><button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
+		// Set current timing method (can change in settings)
+		if (isset($_POST['select_timing_method']) && $_SESSION['curr_timing_method'] != $_POST['select_timing_method'])
+			$_SESSION['curr_timing_method'] = $_POST['select_timing_method'];
+		
+		if ($_SESSION['curr_timing_method'] == 'manual') {
+			echo '<input type="text" name="solve_time" autocomplete="off" style="font-size:40px;text-align:center;background-color:#efefef;">';
+		} else if ($_SESSION['curr_timing_method'] == 'spacebar') {
+			echo '<div id="solve_time">0.00</div>';
+			echo '<input type="hidden" name="solve_time" value="0.00">';
+		}
+		echo '<input type="hidden" name="solve_penalty" value="0">';
+		echo '<br>';
+		echo '<button id="two_s_penalty">+2</button>';
+		echo '<button type="submit" name="submit_solve" style="margin:auto;font-size:20px">Submit</button>';
 	
 	echo '</form>';
 	
@@ -600,27 +589,22 @@
 	echo '<span id="display_ao5" style="display:'.$_SESSION['curr_ao5_display'].'">ao5: ';
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(2, 5, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
-	    // 	    echo trim_and_avg(4, 25, 100);
 	echo '</span><span id="display_ao12" style="display:'.$_SESSION['curr_ao12_display'].'">ao12: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(2, 12, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
-	    // 	    echo trim_and_avg(4, 25, 100);
 	echo '</span><span id="display_ao25" style="display:'.$_SESSION['curr_ao25_display'].'">ao25: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(4, 25, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
-	    // 	    echo trim_and_avg(4, 25, 100);
     echo '</span><span id="display_ao50" style="display:'.$_SESSION['curr_ao50_display'].'">ao50: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(6, 50, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
-	    // 	    echo trim_and_avg(4, 25, 100);
     echo '</span><span id="display_ao100" style="display:'.$_SESSION['curr_ao100_display'].'">ao100: ';
 	
 	if (isset($_SESSION['3x3_time_list']))
 	    echo trim_and_avg(10, 100, count($_SESSION[$curr_time_list_name]) - 1, $curr_time_list_name);
-	    // 	    echo trim_and_avg(4, 25, 100);    
 	echo '</span></div>';
 	    
 	// End of 'submit_times_container'
@@ -629,7 +613,6 @@
 	// End of 'timer_main', right side of the screen
 	echo '</div>';
 
-// */ // NOTE debug trying to see where changing puzzle affects the page
 
 	// End of 'timer', content of the page
 	echo '</div>';

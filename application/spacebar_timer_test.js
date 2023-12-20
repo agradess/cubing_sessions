@@ -1,4 +1,14 @@
 
+// put a hidden input that keeps track of the penalty
+// should add two seconds automatically if there is a +2 to the
+// hidden input field for the raw value
+// TODO: figure out how to represent DNFs in the data, and how to
+// calculate averages with them 
+// TODO: reset the penalty to a default value like 0 whenever you start
+// inspection, although I may not have to, since page resets each time
+
+// when you use manual entry, will have to have +2 and DNF buttons
+
 let timing = false;
 let inspecting = false; // addition
 let spacebar_down = false;
@@ -15,34 +25,24 @@ $(document).on('keydown',function(e) {
 		var solve_time = document.getElementById('solve_time');
 		spacebar_down = true;
 		
-		// if (solve_time.innerHTML == '0.00') { // not sure why this check is here
-		// 	// alert('time is 0.00');
-		// 	solve_time.style.color = '#34eb43';
-		// } else {
-			if (!timing) {
-				solve_time.innerHTML = '0.00';
-				if (!inspecting) {
-					solve_time.style.color = '#ff4545'; // red
-				} else {
-					clearInterval(intervalID);
-					solve_time.style.color = '#34eb43'; // green
-				}
+		if (!timing) {
+			solve_time.innerHTML = '0.00';
+			if (!inspecting) {
+				solve_time.style.color = '#ff4545'; // red
 			} else {
-				storeTime(elapsed_hundredths_second);
+				clearInterval(intervalID);
+				solve_time.style.color = '#34eb43'; // green
 			}
-		// }
+		} else {
+			storeTime(elapsed_hundredths_second);
+		}
     }
 });
 
 
-// Tried to create timer here, may also someone else's fxn, modified
-
 // When spacebar is released
 $(document).keyup(function(e) {
 	if(e.which == 32) { // Spacebar
-		// alert('Spacebar released');
-		// case 1: spacebar released after starting timer
-		// case 2: spacebar released after stopping timer
 
 		var solve_time = document.getElementById('solve_time');
 		console.log(solve_time);
@@ -62,13 +62,7 @@ $(document).keyup(function(e) {
 		}
 		
 		if (timing) {
-		// grab current time in minutes seconds milliseconds
-			timer_started_date = Date.now();
-		// while (timing) {
-		// 	// difference between time outside loop and current time inside loop
-		// 	solve_time.innerHTML = Date.now() - start;
-		// }
-			timerUpdating(timer_started_date);
+			timerUpdating();
 		}
 	}
 });

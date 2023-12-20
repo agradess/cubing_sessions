@@ -149,6 +149,15 @@ button:active {
 	font-size: 80px;
 }
 
+#two_s_penalty {
+	font-size: 20px;
+	margin-inline: 10px;
+}
+
+#two_s_penalty:hover {
+	background-color: #0c5e55;
+}
+
 #display_avgs {
 	margin: 10px 400px;
 }

@@ -131,6 +131,18 @@ document.getElementById('display_settings_screen').addEventListener('click', fun
 	settings_screen.style.display = 'block';
 });
 
+
+
+//							***** Manually Adding Penalties *****
+
+document.getElementById('two_s_penalty').addEventListener('click', function(event) {
+	event.preventDefault();
+
+	let solve_penalty = document.querySelector('[name="solve_penalty"]');
+	solve_penalty.value = Number(solve_penalty.value) + 2;
+	event.target.style.backgroundColor = "#0c5e55";
+});
+
 //							***** Settings Menu Functions [UNUSED] *****
 /*
 document.getElementById('toggle_ao5').addEventListener('click', function(event) {
